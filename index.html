@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#000000" />
+		<title>Talous</title>
+		<link rel="icon" type="image/png" href="/src/icons/favicon-96x96.png" sizes="96x96" />
+		<link rel="icon" type="image/svg+xml" href="/src/icons/favicon.svg" />
+		<link rel="shortcut icon" href="/src/icons/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/src/icons/apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-title" content="Talous" />
+		<link rel="manifest" href="/src/icons/site.webmanifest" />
+		<link rel="stylesheet" href="src/css/pages/dashboard.css?v=3.4" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css?v=3.4" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+	</head>
+	<body>
+			<header class="topbar">
+				<button id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation">☰</button>
+				<div class="brand">Talous</div>
+				<div class="actions">
+					<button id="open-json" class="btn" title="Open JSON" aria-label="Open JSON"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></button>
+					<button id="save-json" class="btn" title="Save JSON" aria-label="Save JSON"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
+				<button id="theme-toggle" class="btn btn-ghost" title="Toggle theme"><i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i></button>
+				</div>
+			</header>
+				<aside id="sidebar" class="sidebar">
+					<ul class="menu-list">
+						<li><a href="/index.html?v=3.6" id="nav-dashboard" class="nav-link active">Dashboard</a></li>
+						<li><a href="/pages/transactions.html?v=3.6" id="nav-transactions" class="nav-link">Transactions</a></li>
+						<li><a href="/pages/charts.html?v=3.6" id="nav-charts" class="nav-link">Charts</a></li>
+						<li><a href="/pages/banks.html?v=3.6" id="nav-banks" class="nav-link">Banks</a></li>
+						<li><a href="/pages/goals.html?v=3.6" id="nav-goals" class="nav-link">Goals</a></li>
+						<li><a href="/pages/recurring.html?v=3.6" id="nav-recurring" class="nav-link">Recurring</a></li>
+						<li><a href="/pages/settings.html?v=3.6" id="nav-settings" class="nav-link">Settings</a></li>
+					</ul>
+			</aside>
+
+		<!-- Floating Unsaved Badge -->
+		<button id="unsaved-badge" class="unsaved-badge hidden" title="Download JSON">
+			<span id="unsaved-count">0</span>
+		</button>
+
+		<main class="container">
+					<!-- Dashboard -->
+					<section id="dashboard" class="view active">
+						<div class="card balance-card">
+							<div class="label">Current Balance</div>
+							<div id="current-balance" class="balance">€ 0,00</div>
+						</div>
+						<div style="margin: 10px 0 14px; text-align: left;">
+							<button id="btn-new-transaction-home" class="btn">+ Add</button>
+						</div>
+						<div class="card panel">
+							<h3>Recent Transactions</h3>
+							<div id="recent-transactions" class="recent-list"></div>
+						</div>
+					</section>
+
+		<dialog id="transaction-modal" class="modal">
+				<div class="toolbar">
+					<div class="filters">
+						<select id="filter-type">
+							<option value="">All types</option>
+							<option value="income">Income</option>
+							<option value="expense">Expense</option>
+						</select>
+						<select id="filter-category"><option value="">All categories</option></select>
+						<select id="filter-method"><option value="">All methods</option></select>
+					</div>
+				</div>
+				<div style="margin: 10px 0 14px; text-align: left;">
+					<button id="btn-new-transaction" class="btn">+ Add</button>
+				</div>
+				<div id="transactions-list" class="list"></div>
+			</section>
+
+			<!-- Recurring -->
+			<section id="recurring" class="view">
+				<div class="toolbar" style="justify-content: center;">
+					<button id="btn-new-recurring" class="btn">+ New recurring</button>
+				</div>
+				<div class="grid-2">
+					<div class="card">
+									<h3>Recurring Incomes</h3>
+						<div id="recurring-incomes" class="list"></div>
+					</div>
+					<div class="card">
+									<h3>Recurring Expenses</h3>
+						<div id="recurring-expenses" class="list"></div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Settings -->
+			<section id="settings" class="view">
+				<div class="grid-3">
+					<div class="card">
+									<h3>Income Categories</h3>
+						<ul id="income-categories" class="simple-list"></ul>
+									<button id="btn-add-income-cat" class="btn btn-ghost">Add Income Category</button>
+					</div>
+					<div class="card">
+									<h3>Expense Categories</h3>
+						<ul id="expense-categories" class="simple-list"></ul>
+									<button id="btn-add-expense-cat" class="btn btn-ghost">Add Expense Category</button>
+					</div>
+					<div class="card">
+									<h3>Payment Methods</h3>
+						<ul id="payment-methods" class="simple-list"></ul>
+									<button id="btn-add-method" class="btn btn-ghost">Add Method</button>
+					</div>
+				</div>
+				<div class="grid-2" style="margin-top:16px;">
+					<div class="card">
+						<h3>Sample Data</h3>
+						<p>Download a complete example JSON with one month of expenses.</p>
+						<button id="btn-download-sample" class="btn">Download sample JSON</button>
+					</div>
+					<div class="card">
+						<h3>Install App (PWA)</h3>
+						<p>Install Talous on your device for a native-like experience. Works on Android and desktop browsers. iOS requires a manual procedure.</p>
+						<button id="btn-install-pwa" class="btn">Install app</button>
+					</div>
+				</div>
+				<footer class="links" style="justify-content: space-between; align-items:center;">
+					<div style="display:flex; gap:16px; flex-wrap:wrap;">
+						<a href="#" id="link-privacy">Privacy & Cookies</a>
+						<a href="#" id="link-how">How it works</a>
+						<a href="https://github.com/PecoraroAmal/Talous" target="_blank" rel="noopener noreferrer">GitHub</a>
+					</div>
+					<div>
+						<a class="btn" href="https://www.paypal.com/donate/?hosted_button_id=5Z5N9EBJERXC6" target="_blank" rel="noopener noreferrer">Donate via PayPal</a>
+					</div>
+				</footer>
+			</section>
+		</main>
+
+		<!-- Toasts -->
+		<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+		<!-- Modals -->
+		<dialog id="transaction-modal" class="modal">
+			<form id="transaction-form" method="dialog" class="modal-body">
+				<header class="modal-header">
+					<h3 id="transaction-modal-title">New transaction</h3>
+				</header>
+				<div class="form-grid">
+					<label>Type<select id="txn-type" name="type"><option value="income">Income</option><option value="expense" selected>Expense</option><option value="transfer">Transfer</option></select></label>
+					<label>Amount<input id="txn-amount" name="amount" type="number" step="0.01" min="0" required /></label>
+					<label>Date<input id="txn-date" name="date" type="date" required /></label>
+					<label id="txn-category-group">Category<select id="txn-category" name="category"></select></label>
+					<label id="payment-method-group">Method<select id="txn-method" name="payment-method"></select></label>
+					<label id="txn-bank-group">Bank<select id="txn-bank" name="bank"></select></label>
+					<label>Note<input id="txn-note" name="description" type="text" placeholder="optional" /></label>
+					<div id="crypto-fields" class="row" style="display:none">
+						<label>Ticker<input id="txn-crypto-ticker" type="text" placeholder="BTC" /></label>
+						<label>EUR value<input id="txn-crypto-value" type="number" step="0.01" min="0" /></label>
+						<label>Quantity<input id="txn-crypto-qty" type="number" step="0.00000001" min="0" value="1" /></label>
+					</div>
+					<div id="transfer-fields" class="row" style="display:none">
+						<label>From bank<select id="txn-from-bank"></select></label>
+						<label>To bank<select id="txn-to-bank"></select></label>
+					</div>
+				</div>
+				<footer class="modal-footer modal-footer-layout">
+					<div class="footer-left"><button id="txn-delete-btn" type="button" class="btn btn-danger" style="display:none" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
+					<div class="footer-center"><button type="button" class="btn" data-close title="Annulla"><i class="fa-solid fa-xmark"></i></button></div>
+					<div class="footer-right"><button type="submit" class="btn btn-primary" title="Salva"><i class="fa-solid fa-save"></i></button></div>
+				</footer>
+			</form>
+		</dialog>
+
+		<!-- Info modals -->
+		<dialog id="modal-privacy" class="modal">
+			<div class="modal-body">
+				<header class="modal-header">
+					<h3>Privacy & Cookies</h3>
+				</header>
+				<div style="padding:16px;">
+					<p>Talous stores all your data locally on your device within a single JSON file and an automatic backup in your browser’s storage (IndexedDB). No data is sent to any server.</p>
+					<p>Cookies: only essential, technical storage may be used by the browser and the service worker to keep the app offline. No tracking or analytics cookies are used.</p>
+					<p>You can delete your data at any time by clearing the auto-backup and removing your JSON file.</p>
+				</div>
+			</div>
+		</dialog>
+
+		<dialog id="modal-how" class="modal">
+			<div class="modal-body">
+				<header class="modal-header">
+					<h3>How it works</h3>
+				</header>
+				<div style="padding:16px;">
+					<p>Talous is a 100% offline PWA. Use a local JSON file to store and manage your finances. The app keeps an automatic local backup.</p>
+					<p>Install as an app:</p>
+					<ul>
+						<li>Android and desktop: click “Install app” above or use your browser’s “Install” option.</li>
+						<li>iOS (Safari): tap Share → Add to Home Screen to install. The install prompt is not supported on iOS.</li>
+					</ul>
+				</div>
+			</div>
+		</dialog>
+
+			<dialog id="recurring-modal" class="modal">
+			<form id="recurring-form" method="dialog" class="modal-body">
+				<header class="modal-header">
+					<h3 id="modal-title-recurring">New recurring</h3>
+				</header>
+				<div class="form-grid">
+						<label>Type<select id="rec-type" name="recurring-type"><option value="income">Income</option><option value="expense" selected>Expense</option></select></label>
+						<label>Frequency<select id="rec-frequency"><option value="monthly" selected>Monthly</option><option value="annual">Annual</option></select></label>
+					<label>Name<input id="rec-name" type="text" required /></label>
+					<label>Amount<input id="rec-amount" name="recurring-amount" type="number" step="0.01" min="0" required /></label>
+					<label>Day of month<input id="rec-day" type="number" min="1" max="28" required /></label>
+						<label id="rec-month-group" style="display:none;">Month<select id="rec-month">
+							<option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option>
+							<option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option>
+							<option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+						</select></label>
+					<label>Category<select id="rec-category" name="recurring-category"></select></label>
+					<label id="rec-payment-group">Method<select id="rec-method"></select></label>
+				</div>
+				<footer class="modal-footer">
+					<button type="button" class="btn" data-close>Cancel</button>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</footer>
+			</form>
+		</dialog>
+
+		<dialog id="editor-modal" class="modal">
+			<form id="editor-form" method="dialog" class="modal-body">
+				<header class="modal-header">
+					<h3 id="editor-modal-title">Edit</h3>
+				</header>
+				<div class="form-grid">
+					<label>Name<input id="editor-input" type="text" required /></label>
+					<label id="editor-colour-row" style="display:none;">Colour<input id="editor-colour" type="color" value="#000000" /></label>
+					<label id="editor-target-row" style="display:none;">Target<input id="editor-target" type="number" step="0.01" min="0" value="0" /></label>
+					<label id="editor-saved-row" style="display:none;">Saved<input id="editor-saved" type="number" step="0.01" min="0" value="0" /></label>
+				</div>
+				<footer class="modal-footer">
+					<button id="btn-delete-item" type="button" class="btn btn-danger" style="display:none"><i class="fa-solid fa-trash"></i></button>
+					<div class="spacer"></div>
+					<button type="button" class="btn" data-close><i class="fa-solid fa-xmark"></i></button>
+					<button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i></button>
+				</footer>
+			</form>
+		</dialog>
+
+		<!-- Fallback file input (hidden) -->
+		<input id="file-input" type="file" accept="application/json" style="display:none" />
+
+		<!-- Vendor scripts -->
+		<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js?v=3.4"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js?v=3.4"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js?v=3.4"></script>
+
+		<!-- App scripts (ES modules) -->
+		<script type="module" src="src/js/utils.js?v=3.4"></script>
+		<script type="module" src="src/js/storage.js?v=3.4"></script>
+		<script type="module" src="src/js/ui.js?v=3.4"></script>
+		<script type="module" src="src/js/charts.js?v=3.4"></script>
+		<script type="module" src="src/js/app.js?v=3.4"></script>
+		<script type="module" src="/src/js/pages/dashboard.js?v=3.4"></script>
+
+		<script>
+			// Service worker registration
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker.register('sw.js').catch(() => {});
+				});
+			}
+			// Theme auto-detect
+			(function() {
+				const saved = localStorage.getItem('theme');
+				if (saved) document.documentElement.setAttribute('data-theme', saved);
+				else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					document.documentElement.setAttribute('data-theme', 'dark');
+				}
+			})();
+		</script>
+	</body>
+	</html>
+    

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Charts · Talous</title>
+  <link rel="icon" type="image/png" href="/src/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/src/icons/favicon.svg" />
+  <link rel="shortcut icon" href="/src/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/src/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Talous" />
+  <link rel="manifest" href="/src/icons/site.webmanifest" />
+  <link rel="stylesheet" href="/src/css/pages/charts.css?v=3.4" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css?v=3.4" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+</head>
+<body>
+	<header class="topbar">
+		<button id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation">☰</button>
+		<div class="brand">Talous</div>
+		<div class="actions">
+			<button id="open-json" class="btn" title="Open JSON" aria-label="Open JSON"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></button>
+			<button id="save-json" class="btn" title="Save JSON" aria-label="Save JSON"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
+		<button id="theme-toggle" class="btn btn-ghost" title="Toggle theme"><i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i></button>
+		</div>
+	</header>
+		<aside id="sidebar" class="sidebar hidden">
+			<ul class="menu-list">
+				<li><a href="/index.html?v=3.6" id="nav-dashboard" class="nav-link">Dashboard</a></li>
+				<li><a href="/pages/transactions.html?v=3.6" id="nav-transactions" class="nav-link">Transactions</a></li>
+				<li><a href="/pages/charts.html?v=3.6" id="nav-charts" class="nav-link active">Charts</a></li>
+				<li><a href="/pages/banks.html?v=3.6" id="nav-banks" class="nav-link">Banks</a></li>
+				<li><a href="/pages/goals.html?v=3.6" id="nav-goals" class="nav-link">Goals</a></li>
+				<li><a href="/pages/recurring.html?v=3.6" id="nav-recurring" class="nav-link">Recurring</a></li>
+				<li><a href="/pages/settings.html?v=3.6" id="nav-settings" class="nav-link">Settings</a></li>
+			</ul>
+	</aside>
+
+	<!-- Floating Unsaved Badge -->
+	<button id="unsaved-badge" class="unsaved-badge hidden" title="Download JSON">
+		<span id="unsaved-count">0</span>
+	</button>
+  <main class="container">
+    <section id="charts">
+      <div class="card panel pie-card">
+        <h3>Expenses</h3>
+        <div class="pie-grid">
+          <div class="pie-item">
+            <h4>By Category</h4>
+            <div class="chart-wrapper"><canvas id="category-chart"></canvas></div>
+          </div>
+          <div class="pie-item">
+            <h4>By Payment Method</h4>
+            <div class="chart-wrapper"><canvas id="payment-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="card panel" style="margin-top:16px;">
+        <h3>Balance over time</h3>
+        <div class="chart-wrapper"><canvas id="balance-chart"></canvas></div>
+      </div>
+    </section>
+  </main>
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <!-- Fallback file input (hidden) -->
+  <input id="file-input" type="file" accept="application/json" style="display:none" />
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js?v=3.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js?v=3.4"></script>
+  <script type="module" src="/src/js/utils.js?v=3.4"></script>
+  <script type="module" src="/src/js/storage.js?v=3.4"></script>
+  <script type="module" src="/src/js/ui.js?v=3.4"></script>
+  <script type="module" src="/src/js/pages/charts-app.js?v=3.4"></script>
+  <script type="module" src="/src/js/pages/charts.js?v=3.4"></script>
+</body>
+</html>

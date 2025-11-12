@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings · Talous</title>
+  <link rel="icon" type="image/png" href="/src/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/src/icons/favicon.svg" />
+  <link rel="shortcut icon" href="/src/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/src/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Talous" />
+  <link rel="manifest" href="/src/icons/site.webmanifest" />
+  <link rel="stylesheet" href="/src/css/pages/settings.css?v=3.4" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css?v=3.4" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+</head>
+<body>
+	<header class="topbar">
+		<button id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation">☰</button>
+		<div class="brand">Talous</div>
+		<div class="actions">
+			<button id="open-json" class="btn" title="Open JSON" aria-label="Open JSON"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></button>
+			<button id="save-json" class="btn" title="Save JSON" aria-label="Save JSON"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
+		<button id="theme-toggle" class="btn btn-ghost" title="Toggle theme"><i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i></button>
+		</div>
+	</header>
+		<aside id="sidebar" class="sidebar hidden">
+			<ul class="menu-list">
+				<li><a href="/index.html?v=3.6" id="nav-dashboard" class="nav-link">Dashboard</a></li>
+				<li><a href="/pages/transactions.html?v=3.6" id="nav-transactions" class="nav-link">Transactions</a></li>
+				<li><a href="/pages/charts.html?v=3.6" id="nav-charts" class="nav-link">Charts</a></li>
+				<li><a href="/pages/banks.html?v=3.6" id="nav-banks" class="nav-link">Banks</a></li>
+				<li><a href="/pages/goals.html?v=3.6" id="nav-goals" class="nav-link">Goals</a></li>
+				<li><a href="/pages/recurring.html?v=3.6" id="nav-recurring" class="nav-link">Recurring</a></li>
+				<li><a href="/pages/settings.html?v=3.6" id="nav-settings" class="nav-link active">Settings</a></li>
+			</ul>
+	</aside>
+
+	<!-- Floating Unsaved Badge -->
+	<button id="unsaved-badge" class="unsaved-badge hidden" title="Download JSON">
+		<span id="unsaved-count">0</span>
+	</button>
+  <main class="container">
+    <section id="settings" class="view active">
+      <div class="grid-3">
+        <div class="card">
+          <h3><i class="fa-solid fa-arrow-up" style="color: var(--success);"></i> Income Categories</h3>
+          <ul id="income-categories" class="simple-list"></ul>
+          <button id="btn-add-income-cat" class="btn btn-ghost">Add Income Category</button>
+        </div>
+        <div class="card">
+          <h3><i class="fa-solid fa-arrow-down" style="color: var(--danger);"></i> Expense Categories</h3>
+          <ul id="expense-categories" class="simple-list"></ul>
+          <button id="btn-add-expense-cat" class="btn btn-ghost">Add Expense Category</button>
+        </div>
+        <div class="card">
+          <h3><i class="fa-solid fa-credit-card"></i> Payment Methods</h3>
+          <ul id="payment-methods" class="simple-list"></ul>
+          <button id="btn-add-method" class="btn btn-ghost">Add Method</button>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <h3><i class="fa-solid fa-download"></i> Sample Data</h3>
+          <p>Download a complete example JSON with one month of expenses.</p>
+          <button id="btn-download-sample" class="btn">Download sample JSON</button>
+        </div>
+        <div class="card">
+          <h3><i class="fa-solid fa-mobile-screen-button"></i> Install App (PWA)</h3>
+          <p>Install Talous on your device for a native-like experience. Works on Android and desktop browsers. iOS requires a manual procedure.</p>
+          <button id="btn-install-pwa" class="btn">Install app</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="page-footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <button id="btn-privacy" class="btn-link">Privacy & Cookies</button>
+        <button id="btn-how" class="btn-link">How it works</button>
+        <a href="https://github.com/PecoraroAmal/Talous" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <div class="footer-donate">
+        <a class="btn" href="https://www.paypal.com/donate/?hosted_button_id=5Z5N9EBJERXC6" target="_blank" rel="noopener noreferrer" style="background-color: #003580;">Support</a>
+      </div>
+    </div>
+  </footer>
+  <dialog id="privacy-modal" class="modal">
+    <div class="modal-body">
+      <header class="modal-header">
+        <h3>Privacy Policy & Cookies</h3>
+      </header>
+      <div class="modal-content">
+        <p><strong>Privacy Policy</strong></p>
+        <p>Talous is committed to protecting your privacy. We do not collect, store, or share any personal data. All your financial information remains stored locally on your device and is never transmitted to any server.</p>
+        <p>Your data is saved in your browser's local storage and IndexedDB for backup purposes. You have full control over your data and can export or delete it at any time.</p>
+        <p><strong>Cookies</strong></p>
+        <p>Talous does not use any cookies. No tracking, no analytics, no third-party services. Your data stays private and secure on your device.</p>
+        <p>If you have any questions about this privacy policy, please contact us via GitHub.</p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn" data-close>Close</button>
+      </footer>
+    </div>
+  </dialog>
+  <dialog id="how-modal" class="modal">
+    <div class="modal-body">
+      <header class="modal-header">
+        <h3>How it works</h3>
+      </header>
+      <div class="modal-content">
+        <p><strong style="color: #003580;">Talous</strong> means <em>economy</em> or <em>household management</em> in Finnish.</p>
+        <p>Talous is a Progressive Web App (PWA) designed to help you manage your personal finances locally on your device. Here's how it works:</p>
+        <ol>
+          <li><strong>Data Storage:</strong> All your data is stored locally in your browser using IndexedDB and can be exported as a JSON file for backup.</li>
+          <li><strong>Adding Transactions:</strong> Use the "Add" button to record incomes and expenses. Categorise them and choose payment methods.</li>
+          <li><strong>Customisation:</strong> Create and edit categories and payment methods in the Settings page to suit your needs.</li>
+          <li><strong>Visualisation:</strong> View your financial data through charts and balance overviews on the Charts page.</li>
+          <li><strong>Goals:</strong> Set savings goals and track your progress towards them.</li>
+          <li><strong>Backup:</strong> Regularly save your data as a JSON file. The app shows a red badge when there are unsaved changes.</li>
+        </ol>
+        <p><strong>PWA Features:</strong></p>
+        <ul>
+          <li>Installable on desktop and mobile devices for a native app-like experience.</li>
+          <li>Works offline once installed.</li>
+          <li>Automatic updates when new versions are available.</li>
+          <li>Secure: No data is sent to any server; everything stays on your device.</li>
+        </ul>
+        <p>Get started by adding your first transaction!</p>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn" data-close>Close</button>
+      </footer>
+    </div>
+  </dialog>
+  <dialog id="editor-modal" class="modal">
+    <form id="editor-form" method="dialog" class="modal-body">
+      <header class="modal-header">
+        <h3 id="editor-modal-title">Edit</h3>
+      </header>
+      <div class="form-grid">
+        <label>Name<input id="editor-input" type="text" required /></label>
+        <label id="editor-colour-row" style="display:none;">Colour<br><br><input id="editor-colour" type="color" value="#000000" /></label>
+        <label id="editor-target-row" style="display:none;">Target<input id="editor-target" type="number" step="0.01" min="0" value="0" /></label>
+        <label id="editor-saved-row" style="display:none;">Saved<input id="editor-saved" type="number" step="0.01" min="0" value="0" /></label>
+      </div>
+      <footer class="modal-footer modal-footer-layout">
+        <div class="footer-left"><button id="btn-delete-item" type="button" class="btn btn-danger" style="display:none" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
+        <div class="footer-center"><button type="button" class="btn" data-close title="Annulla"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="footer-right"><button type="submit" class="btn btn-primary" title="Salva"><i class="fa-solid fa-save"></i></button></div>
+      </footer>
+    </form>
+  </dialog>
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <!-- Fallback file input (hidden) -->
+  <input id="file-input" type="file" accept="application/json" style="display:none" />
+  <script type="module" src="/src/js/utils.js?v=3.4"></script>
+  <script type="module" src="/src/js/storage.js?v=3.4"></script>
+  <script type="module" src="/src/js/ui.js?v=3.4"></script>
+  <script type="module" src="/src/js/charts.js?v=3.4"></script>
+  <script type="module" src="/src/js/app.js?v=3.4"></script>
+  <script type="module" src="/src/js/pages/settings.js?v=3.4"></script>
+</body>
+</html>

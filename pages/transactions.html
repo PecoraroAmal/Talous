@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transactions · Talous</title>
+  <link rel="icon" type="image/png" href="/src/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/src/icons/favicon.svg" />
+  <link rel="shortcut icon" href="/src/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/src/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Talous" />
+  <link rel="manifest" href="/src/icons/site.webmanifest" />
+  <link rel="stylesheet" href="/src/css/pages/transactions.css?v=3.4" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css?v=3.4" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+</head>
+<body>
+	<header class="topbar">
+		<button id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation">☰</button>
+		<div class="brand">Talous</div>
+		<div class="actions">
+			<button id="open-json" class="btn" title="Open JSON" aria-label="Open JSON"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></button>
+			<button id="save-json" class="btn" title="Save JSON" aria-label="Save JSON"><i class="fa-solid fa-download" aria-hidden="true"></i></button>
+		<button id="theme-toggle" class="btn btn-ghost" title="Toggle theme"><i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i></button>
+		</div>
+	</header>
+		<aside id="sidebar" class="sidebar hidden">
+			<ul class="menu-list">
+				<li><a href="/index.html?v=3.6" id="nav-dashboard" class="nav-link">Dashboard</a></li>
+				<li><a href="/pages/transactions.html?v=3.6" id="nav-transactions" class="nav-link active">Transactions</a></li>
+				<li><a href="/pages/charts.html?v=3.6" id="nav-charts" class="nav-link">Charts</a></li>
+				<li><a href="/pages/banks.html?v=3.6" id="nav-banks" class="nav-link">Banks</a></li>
+				<li><a href="/pages/goals.html?v=3.6" id="nav-goals" class="nav-link">Goals</a></li>
+				<li><a href="/pages/recurring.html?v=3.6" id="nav-recurring" class="nav-link">Recurring</a></li>
+				<li><a href="/pages/settings.html?v=3.6" id="nav-settings" class="nav-link">Settings</a></li>
+			</ul>
+	</aside>
+
+	<!-- Floating Unsaved Badge -->
+	<button id="unsaved-badge" class="unsaved-badge hidden" title="Download JSON">
+		<span id="unsaved-count">0</span>
+	</button>
+  <main class="container">
+    <section>
+      <div class="toolbar">
+        <div class="filters">
+          <select id="filter-type">
+            <option value="">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+            <option value="transfer">Transfer</option>
+          </select>
+          <select id="filter-category"><option value="">All categories</option></select>
+          <select id="filter-method"><option value="">All methods</option></select>
+          <select id="filter-month">
+            <option value="">All months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin: 10px 0 14px; text-align: left;">
+        <button id="btn-new-transaction" class="btn">+ Add</button>
+      </div>
+      <div id="transactions-list" class="list"></div>
+    </section>
+  </main>
+  <!-- Confirm modal duplicated removal note: ensure only one instance per page -->
+  <dialog id="transaction-modal" class="modal">
+    <form id="transaction-form" method="dialog" class="modal-body">
+      <header class="modal-header">
+        <h3 id="transaction-modal-title">New transaction</h3>
+      </header>
+      <div class="form-grid">
+        <label>Type<select id="txn-type" name="type"><option value="income">Income</option><option value="expense" selected>Expense</option><option value="transfer">Transfer</option></select></label>
+        <label>Amount<input id="txn-amount" name="amount" type="number" step="0.01" min="0" required /></label>
+        <label>Date<input id="txn-date" name="date" type="date" required /></label>
+        <label id="txn-category-group">Category<select id="txn-category" name="category"></select></label>
+        <label id="payment-method-group">Method<select id="txn-method" name="payment-method"></select></label>
+        <label id="txn-bank-group">Bank<select id="txn-bank" name="bank"></select></label>
+        <label>Note<input id="txn-note" name="description" type="text" placeholder="optional" /></label>
+        <div id="crypto-fields" class="row" style="display:none">
+          <label>Ticker<input id="txn-crypto-ticker" type="text" placeholder="BTC" /></label>
+          <label>EUR value<input id="txn-crypto-value" type="number" step="0.01" min="0" /></label>
+          <label>Quantity<input id="txn-crypto-qty" type="number" step="0.00000001" min="0" value="1" /></label>
+        </div>
+        <div id="transfer-fields" class="row" style="display:none">
+          <label>From bank<select id="txn-from-bank"></select></label>
+          <label>To bank<select id="txn-to-bank"></select></label>
+        </div>
+      </div>
+      <footer class="modal-footer modal-footer-layout">
+        <div class="footer-left"><button id="txn-delete-btn" type="button" class="btn btn-danger" style="display:none" title="Delete"><i class="fa-solid fa-trash"></i></button></div>
+        <div class="footer-center"><button type="button" class="btn" data-close title="Annulla"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="footer-right"><button type="submit" class="btn btn-primary" title="Salva"><i class="fa-solid fa-save"></i></button></div>
+      </footer>
+    </form>
+  </dialog>
+	<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+	<!-- Fallback file input (hidden) -->
+	<input id="file-input" type="file" accept="application/json" style="display:none" />
+
+  <!-- Confirm modal -->
+  <dialog id="confirm-modal" class="modal">
+    <form method="dialog" class="modal-body">
+      <header class="modal-header">
+        <h3>Confirm</h3>
+      </header>
+      <div id="confirm-message" class="modal-content"></div>
+      <footer class="modal-footer">
+        <button type="button" class="btn" data-cancel><i class="fa-solid fa-xmark"></i></button>
+        <button type="submit" class="btn btn-danger" id="confirm-ok"><i class="fa-solid fa-trash"></i></button>
+      </footer>
+    </form>
+  </dialog>
+	<script type="module" src="/src/js/utils.js?v=3.4"></script>
+  <script type="module" src="/src/js/storage.js?v=3.4"></script>
+  <script type="module" src="/src/js/ui.js?v=3.4"></script>
+  <script type="module" src="/src/js/charts.js?v=3.4"></script>
+  <script type="module" src="/src/js/app.js?v=3.4"></script>
+  <script type="module" src="/src/js/pages/transactions.js?v=3.4"></script>
+</body>
+</html>
