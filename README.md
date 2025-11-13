@@ -1,152 +1,100 @@
-# Talous - Personal Finance Tracker
+# Talous – Personal Finance Tracker (PWA)
 
-A minimalist offline Progressive Web App for managing personal finances.
+Minimal, fast, and fully offline-capable web app to manage your personal finances: accounts, payment methods, goals, transactions, and charts.
+
+- Live site: https://pecoraroamal.github.io/Talous/
+- Works offline after first load (Progressive Web App)
+- All data stays on your device (localStorage)
 
 ## Project Structure
 
 ```
 Talous/
-├── index.html          # Dashboard page
-├── index.css           # Dashboard styles
-├── index.js            # Dashboard logic
-├── style.css           # Global shared styles (light/dark theme)
-├── manifest.json       # PWA manifest
-├── sw.js              # Service worker
+├─ index.html           # Dashboard
+├─ index.css            # Dashboard styles
+├─ index.js             # Dashboard logic
+├─ style.css            # Global styles (light/dark)
+├─ manifest.json        # Web App Manifest
+├─ sw.js                # Service Worker (offline cache)
 │
-├── transactions/      # Transaction management
-│   ├── transactions.html
-│   ├── transactions.css
-│   └── transactions.js
+├─ transactions/
+│  ├─ transactions.html
+│  ├─ transactions.css
+│  └─ transactions.js
 │
-├── charts/           # Charts and analytics
-│   ├── charts.html
-│   ├── charts.css
-│   └── charts.js
+├─ charts/
+│  ├─ charts.html
+│  ├─ charts.css
+│  └─ charts.js
 │
-├── tools/            # Banks, wallets, goals, categories
-│   ├── tools.html
-│   ├── tools.css
-│   └── tools.js
+├─ tools/
+│  ├─ tools.html
+│  ├─ tools.css
+│  └─ tools.js
 │
-├── example/          # Sample data
-│   └── example.js
+├─ settings/
+│  ├─ settings.html
+│  ├─ settings.css
+│  └─ settings.js
 │
-├── settings/         # Settings and data management
-│   ├── settings.html
-│   ├── settings.css
-│   └── settings.js
-│
-└── src/
-    └── icons/        # App icons and assets
+└─ example/
+   └─ example.js        # Sample data loaded on first visit
 ```
 
 ## Features
 
-### Dashboard (index.html)
-- Current balance display
-- Last 5 incoming transactions (left column)
-- Last 5 outgoing transactions (right column)
-- Add transaction button
+- Dashboard: current balance, recent income/expenses
+- Transactions: add/edit/delete, search, filters, transfers with safeguards
+- Charts: income/expense by category and method, holdings and trend
+- Tools: manage accounts, methods, categories, and saving goals
+- Settings: import/export JSON, sample data, theme toggle, PWA install
 
-### Transactions
-- Create, edit, and delete transactions
-- Transaction types: Income (green), Expense (red), Transfer (theme-based)
-- Search and filter functionality
-- Form with cancel and save options
+## Data & Privacy
 
-### Charts
-- 6 pie charts:
-  - Income by category
-  - Income by payment type
-  - Expenses by category
-  - Expenses by payment type
-  - Holdings by place
-  - Holdings by currency
-- Money trend chart (line chart)
+- Storage: browser `localStorage` under key `talousData`
+- No backend; no data leaves your device
+- First visit seeds optional sample data from `example/example.js`
 
-### Tools
-- Manage Banks, Wallets, Crypto Wallets, and Piggy Banks
-  - Auto-generated IDs
-  - User-selected colours
-  - Currency selection
-- Saving Goals
-  - Name, target balance, current balance
-  - Start date and target date
-  - Progress bars
-- Categories
-  - Auto-generated IDs
-  - User-selected colours
-
-### Settings
-- Upload JSON (import data)
-- Download JSON (export data)
-- Download sample JSON
-- Theme toggle (persists across all pages)
-- Footer with:
-  - Cookie & Privacy policy
-  - How it Works
-  - GitHub link
-  - PayPal donation button
-
-## Theme Support
-
-**Light Theme:**
-- White background
-- Black text
-- Green for positive numbers
-- Red for negative numbers
-- Black for transfers
-- Yellow for crypto
-
-**Dark Theme:**
-- Black background
-- White text
-- Green for positive numbers
-- Red for negative numbers
-- White for transfers
-- Yellow for crypto
-
-## Data Storage
-
-All data is stored locally in `localStorage` under the key `talousData`. No data is sent to any server.
-
-Data structure:
-```json
+### Data model (simplified)
+```
 {
-  "transactions": [],
-  "categories": {
-    "income": [],
-    "expense": []
-  },
-  "paymentMethods": [],
-  "banks": [],
-  "goals": [],
-  "categoryColours": {},
-  "balance": 0
+  transactions: [],
+  categories: { income: [], expense: [] },
+  paymentMethods: [],
+  banks: [],
+  goals: [],
+  balance: 0
 }
 ```
 
-## PWA Features
+## PWA
 
-This app can be installed as a Progressive Web App and works completely offline.
+- Manifest: `manifest.json` with scope `/Talous/`
+- Service Worker: `sw.js` cache-first for app shell and offline fallback
+- Install: Settings → Install App (or browser menu). The Download button also triggers install when available; otherwise it exports JSON.
 
-## Technology Stack
+Notes for GitHub Pages deployment:
+- App is hosted under `/Talous/`; links and assets use absolute paths prefixed with `/Talous/`.
+- After deploying updates, force-refresh or clear site data to update the service worker.
 
-- Pure HTML, CSS, and JavaScript (ES6 modules)
-- Chart.js for data visualisation
-- Workbox for service worker caching
-- No external frameworks or build tools required
+## Tech Stack
 
-## Development
+- HTML, CSS, JavaScript (ES modules)
+- Chart.js for visualisation
+- No frameworks or build tools required
 
-All code is written in English (UK). The codebase is intentionally minimal and simple.
+## Getting Started (Local)
 
-## Getting Started
+1) Serve the folder locally (for service workers). Example with PowerShell:
+```
+npm install -g http-server
+http-server -c-1 -p 8080 .
+```
+2) Open http://localhost:8080/Talous/
+3) Add transactions or import/export from Settings
+4) Install the PWA from the browser
 
-1. Open `index.html` in a web browser
-2. The app will load with empty data
-3. Add your first transaction or import sample data from Settings
-4. Install as PWA for offline use
+Tip: On plain file:// the service worker won’t register; use a local web server or open the deployed site.
 
 ## License
 
