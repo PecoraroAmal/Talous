@@ -5,9 +5,15 @@ let edit=null;
 
 const id=()=>Date.now().toString(36)+Math.random().toString(36).substr(2);
 const save=()=>{
-  const d=JSON.parse(localStorage.getItem('talousData')||'{}');
-  d.transactions=store.transactions;
-  localStorage.setItem('talousData',JSON.stringify(d));
+  const current=JSON.parse(localStorage.getItem('talousData')||'{}');
+  const next={
+    ...current,
+    banks: store.accounts,
+    paymentMethods: store.methods,
+    categories: store.categories,
+    transactions: store.transactions
+  };
+  localStorage.setItem('talousData',JSON.stringify(next));
   console.log('Saved transactions:', store.transactions.length);
 };
 const load=()=>{
@@ -267,11 +273,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const t=document.getElementById('theme-toggle');
   const saved=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',saved);
-  t.onclick=()=>{
-    const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('theme',next);
-  };
+  if(t){
+    t.onclick=()=>{
+      const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+      document.documentElement.setAttribute('data-theme',next);
+      localStorage.setItem('theme',next);
+    };
+  }
   // sidebar removed
   // open form if requested via query (?add=1)
   const params=new URLSearchParams(location.search);

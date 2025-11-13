@@ -35,27 +35,27 @@ export const SAMPLE_DATA = {
   // Transactions
   transactions: [
     // Opening balances (top-ups)
-    { id: 't_open_bank', type: 'income', amount: 10000, date: '2025-11-01', accountId: 'acc_bank_main', methodId: 'met_card_visa', categoryId: 'cat_income_topup', note: 'Initial top-up' },
-    { id: 't_open_cash', type: 'income', amount: 5000, date: '2025-11-01', accountId: 'acc_wallet', methodId: 'met_cash_wallet', categoryId: 'cat_income_topup', note: 'Initial cash' },
-    { id: 't_open_online', type: 'income', amount: 1000, date: '2025-11-01', accountId: 'acc_wallet_online', methodId: 'met_wallet_paypal', categoryId: 'cat_income_topup', note: 'Initial wallet' },
-    { id: 't_open_crypto', type: 'income', amount: 100, date: '2025-11-01', accountId: 'acc_crypto', methodId: 'met_crypto_btc', categoryId: 'cat_income_topup', note: 'Initial crypto' },
-    { id: 't_open_piggy', type: 'income', amount: 100, date: '2025-11-01', accountId: 'acc_piggy', methodId: '', categoryId: 'cat_income_topup', note: 'Initial piggy' },
+    { id: 't_open_bank', type: 'income', amount: 10000, date: '2025-11-01', accountId: 'acc_bank_main', methodId: 'met_card_visa', category: 'Top-up', note: 'Initial top-up' },
+    { id: 't_open_cash', type: 'income', amount: 5000, date: '2025-11-01', accountId: 'acc_wallet', methodId: 'met_cash_wallet', category: 'Top-up', note: 'Initial cash' },
+    { id: 't_open_online', type: 'income', amount: 1000, date: '2025-11-01', accountId: 'acc_wallet_online', methodId: 'met_wallet_paypal', category: 'Top-up', note: 'Initial wallet' },
+    { id: 't_open_crypto', type: 'income', amount: 100, date: '2025-11-01', accountId: 'acc_crypto', methodId: 'met_crypto_btc', category: 'Top-up', note: 'Initial crypto' },
+    { id: 't_open_piggy', type: 'income', amount: 100, date: '2025-11-01', accountId: 'acc_piggy', methodId: '', category: 'Top-up', note: 'Initial piggy' },
 
     // Entrate: 1000 al mese dal lavoro alla banca (example month)
-    { id: 't_salary_nov', type: 'income', amount: 1000, date: '2025-11-03', accountId: 'acc_bank_main', methodId: 'met_card_visa', categoryId: 'cat_income_salary', note: 'Monthly salary' },
+    { id: 't_salary_nov', type: 'income', amount: 1000, date: '2025-11-03', accountId: 'acc_bank_main', methodId: 'met_card_visa', category: 'Salary', note: 'Monthly salary' },
 
     // Spostamento: 500 da banca a online wallet
-    { id: 't_transfer_bank_to_online', type: 'transfer', amount: 500, date: '2025-11-04', fromAccountId: 'acc_bank_main', fromMethodId: 'met_card_visa', toAccountId: 'acc_wallet_online', toMethodId: 'met_wallet_paypal', note: 'Top up online wallet' },
+    { id: 't_transfer_bank_to_online', type: 'transfer', amount: 500, date: '2025-11-04', fromAccountId: 'acc_bank_main', fromMethodId: 'met_card_visa', toAccountId: 'acc_wallet_online', toMethodId: 'met_wallet_paypal', category: '', note: 'Top up online wallet' },
 
     // Uscite
     // 10/mese Netflix da online wallet
-    { id: 't_netflix_nov', type: 'expense', amount: 10, date: '2025-11-05', accountId: 'acc_wallet_online', methodId: 'met_wallet_paypal', categoryId: 'cat_exp_subscriptions', note: 'Netflix' },
+    { id: 't_netflix_nov', type: 'expense', amount: 10, date: '2025-11-05', accountId: 'acc_wallet_online', methodId: 'met_wallet_paypal', category: 'Subscriptions', note: 'Netflix' },
     // 20/anno PEC dalla banca
-    { id: 't_pec_year', type: 'expense', amount: 20, date: '2025-11-06', accountId: 'acc_bank_main', methodId: 'met_card_visa', categoryId: 'cat_exp_services', note: 'PEC annual fee' },
+    { id: 't_pec_year', type: 'expense', amount: 20, date: '2025-11-06', accountId: 'acc_bank_main', methodId: 'met_card_visa', category: 'Services', note: 'PEC annual fee' },
     // 100 ristorante da cash wallet
-    { id: 't_restaurant', type: 'expense', amount: 100, date: '2025-11-07', accountId: 'acc_wallet', methodId: 'met_cash_wallet', categoryId: 'cat_exp_dining', note: 'Restaurant' },
+    { id: 't_restaurant', type: 'expense', amount: 100, date: '2025-11-07', accountId: 'acc_wallet', methodId: 'met_cash_wallet', category: 'Dining', note: 'Restaurant' },
     // 50 taxi da cash wallet
-    { id: 't_taxi', type: 'expense', amount: 50, date: '2025-11-08', accountId: 'acc_wallet', methodId: 'met_cash_wallet', categoryId: 'cat_exp_transport', note: 'Taxi' }
+    { id: 't_taxi', type: 'expense', amount: 50, date: '2025-11-08', accountId: 'acc_wallet', methodId: 'met_cash_wallet', category: 'Transport', note: 'Taxi' }
   ],
 
   // Saving goals (unchanged, examples)
