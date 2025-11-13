@@ -41,7 +41,7 @@ h2 {
 }
 
 .theme-btn:hover {
-  transform: scale(2.3);
+  transform: scale(1);
 }
 
 /* Data Management Section */
