@@ -41,7 +41,7 @@ h2 {
 }
 
 .theme-btn:hover {
-  transform: scale(2.1);
+  transform: scale(2.2);
 }
 
 /* Data Management Section */
@@ -96,7 +96,7 @@ h2 {
 .section-description {
   font-size: 13px;
   opacity: 0.6;
-  line-height: 2.1;
+  line-height: 2.2;
   max-width: 500px;
   margin: 0 auto;
 }

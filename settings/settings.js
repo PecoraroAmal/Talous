@@ -220,7 +220,7 @@ function hideModal(modalId) {
 // Event listeners
 document.getElementById('upload-btn')?.addEventListener('click', uploadJSON);
 document.getElementById('upload-input')?.addEventListener('change', handleFileUpload);
-document.getElementById('download-btn')?.addEventListener('click', downloadJSON);
+// Remove default download listener; we will attach unified logic below.
 document.getElementById('download-sample-btn')?.addEventListener('click', downloadSampleJSON);
 document.getElementById('clear-btn')?.addEventListener('click', clearAllData);
 document.getElementById('toggle-theme-btn')?.addEventListener('click', toggleTheme);
@@ -274,7 +274,7 @@ loadData();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Talous/sw.js?v=2.0')
+  navigator.serviceWorker.register('/Talous/sw.js?v=2.2')
     .then(reg => console.log('Settings SW registered', reg.scope))
     .catch(err => console.warn('Settings SW registration failed', err));
 }
@@ -283,7 +283,7 @@ if ('serviceWorker' in navigator) {
 const downloadBtn = document.getElementById('download-btn');
 if (downloadBtn) {
   downloadBtn.addEventListener('click', async (ev) => {
-    // If install prompt available, use it; else fall back to JSON download
+    // If install prompt available, prefer install
     if (deferredInstallPrompt) {
       ev.preventDefault();
       try {
@@ -292,16 +292,19 @@ if (downloadBtn) {
         if (choice.outcome === 'accepted') {
           await showMessage({ title: 'Installed', message: 'App installed successfully.', okText: 'OK' });
         } else {
-          await showMessage({ title: 'Dismissed', message: 'Install dismissed.', okText: 'OK' });
+          await showMessage({ title: 'Install', message: 'Install dismissed.', okText: 'OK' });
         }
       } catch (err) {
         await showMessage({ title: 'Install Error', message: 'Unable to start installation.', okText: 'OK' });
       } finally {
         deferredInstallPrompt = null;
+        // Hide install button if present
+        const btn = document.getElementById('install-pwa-btn');
+        if (btn) btn.style.display = 'none';
       }
     } else {
-      // fallback to original download behavior
+      // Normal download behavior
       downloadJSON();
     }
-  }, { once: true }); // ensure we don't double-bind original listener
+  });
 }
