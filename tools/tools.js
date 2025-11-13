@@ -292,8 +292,8 @@ function saveGoal(e) {
   const goal = {
     id: editingGoal?.id || generateId(),
     name: document.getElementById('goal-name').value,
-    target: parseFloat(document.getElementById('goal-target').value),
-    current: parseFloat(document.getElementById('goal-current').value),
+    target: parseAmountEU(document.getElementById('goal-target').value),
+    current: parseAmountEU(document.getElementById('goal-current').value),
     startDate: document.getElementById('goal-start').value,
     targetDate: document.getElementById('goal-end').value,
     colour: document.getElementById('goal-colour').value
@@ -642,7 +642,7 @@ window.editPaymentMethod = function(id) {
 
 // Helper functions
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-GB', { 
+  return new Intl.NumberFormat('it-IT', { 
     style: 'currency', 
     currency: 'EUR' 
   }).format(amount);
@@ -650,7 +650,16 @@ function formatCurrency(amount) {
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// Parse amounts written as 1.234,56 or 1234.56 safely
+function parseAmountEU(value){
+  if (typeof value === 'number') return value;
+  let s=(value||'').toString().trim();
+  s=s.replace(/\./g,'').replace(',', '.');
+  const n=parseFloat(s);
+  return isNaN(n) ? 0 : n;
 }
 
 // Event listeners

@@ -1,4 +1,4 @@
-const APP_VERSION = 'v2.4';
+const APP_VERSION = 'v3.0';
 const CACHE_NAME = `talous-cache-${APP_VERSION}`;
 const urlsToCache = [
   `/Talous/index.html?${APP_VERSION}`,

@@ -49,7 +49,7 @@ function updateBalance() {
 
 // Format currency
 function formatCurrency(amount) {
-  return new Intl.NumberFormat('en-GB', { 
+  return new Intl.NumberFormat('it-IT', { 
     style: 'currency', 
     currency: 'EUR' 
   }).format(amount);
@@ -58,7 +58,16 @@ function formatCurrency(amount) {
 // Format date
 function formatDate(dateStr) {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+}
+
+// Parse amounts written as 1.234,56 or 1234.56 safely
+function parseAmountEU(value){
+  if (typeof value === 'number') return value;
+  let s=(value||'').toString().trim();
+  s=s.replace(/\./g,'').replace(',', '.');
+  const n=parseFloat(s);
+  return isNaN(n) ? 0 : n;
 }
 
 // Render recent transactions (last 5 of each type)
@@ -181,7 +190,7 @@ function saveTransaction(e) {
   const transaction = {
     id: editingTransaction?.id || Date.now().toString(),
     type: document.getElementById('txn-type').value,
-    amount: parseFloat(document.getElementById('txn-amount').value),
+    amount: parseAmountEU(document.getElementById('txn-amount').value),
     category: document.getElementById('txn-category').value,
     paymentMethod: document.getElementById('txn-method').value,
     date: document.getElementById('txn-date').value,

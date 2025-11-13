@@ -1,0 +1,53 @@
+filename: LICENCE
+
+I, Pecoraro Amal, hold the copyright to the Talous™ project.
+
+Copyright (C) 2025 Pecoraro Amal. All rights reserved.
+
+REVOCATION OF PREVIOUS LICENCE
+I, Pecoraro Amal, hereby revoke with immediate effect any GNU Affero General Public Licence v3.0 (AGPL-3.0) previously applied to this project. Any copy distributed prior to this date remains subject to the AGPL-3.0, but all new distributions must comply exclusively with this licence.
+
+I hereby grant to anyone receiving a copy of this software and associated files (the "Software") an irrevocable authorisation to use, copy, modify, merge, publish, distribute, sublicence, and/or sell copies thereof, subject to the following conditions:
+
+1. Open Source Code
+   Every distribution of the Software, whether in original or modified form, MUST include the complete, readable, and non-obfuscated source code, together with this licence.
+
+2. Mandatory Attribution (Exact Author Name Required)
+   Every copy or derivative work MUST contain, in a clearly visible manner (in the README.md file, in the project root, and in every modified source file), the following notice. The author's name MUST appear exactly as "Pecoraro Amal" (this exact string, without changes):
+    Talous™ - Original code by Pecoraro Amal
+    Copyright (C) 2025 Pecoraro Amal
+    Modified by: [Your Name or Organisation] - [Date]
+
+3. Absolute Prohibition on Use of Trademark and Branding
+It is PROHIBITED, under any circumstances:
+- To use the name "Talous", "Talous™", or any confusingly similar variant for derivative distributions
+- To use logos, icons, images, graphic styles, or visual elements present in the original project
+- To create the impression that the derivative product is an official, approved, or connected version of my work
+
+Every derivative work MUST adopt a completely new name, design, and visual identity.
+
+4. Commercial Use Permitted
+Commercial use of the modified Software is permitted, provided all the above conditions are met.
+
+5. No Warranty
+The Software is provided "as is", without any warranties of any kind. I, Pecoraro Amal, shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use of the Software.
+
+6. Breach and Termination
+Breach of any of the above conditions shall result in automatic and immediate revocation of the licence, without prior notice.
+
+7. Governing Law and Jurisdiction
+This licence is governed by Italian law (Law 633/1941 and Legislative Decree 30/2005) and European Union law.
+Any dispute shall be submitted exclusively to the Court of Rome.
+
+---
+
+I, Pecoraro Amal, declare that this is the official licence for the Talous™ project.
+Anyone who complies with it is authorised to use and modify my code.
+Anyone who breaches it will be prosecuted according to the law.
+
+Digitally signed:
+Pecoraro Amal
+Place: Italy
+Date: 31 October 2025
+
+--- END OF LICENCE ---

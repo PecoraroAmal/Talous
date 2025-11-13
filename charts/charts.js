@@ -169,7 +169,7 @@ function createPieChart(canvasId, data, title) {
           callbacks: {
             label: function(context) {
               const label = context.label || '';
-              const value = new Intl.NumberFormat('en-GB', { 
+              const value = new Intl.NumberFormat('it-IT', { 
                 style: 'currency', 
                 currency: 'EUR' 
               }).format(context.parsed);
@@ -208,7 +208,7 @@ function createTrendChart() {
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: trendData.map(d => new Date(d.date).toLocaleDateString('en-GB')),
+      labels: trendData.map(d => new Date(d.date).toLocaleDateString('it-IT')),
       datasets: [{
         label: 'Balance',
         data: trendData.map(d => d.balance),
@@ -227,7 +227,7 @@ function createTrendChart() {
         tooltip: {
           callbacks: {
             label: function(context) {
-              return new Intl.NumberFormat('en-GB', { 
+              return new Intl.NumberFormat('it-IT', { 
                 style: 'currency', 
                 currency: 'EUR' 
               }).format(context.parsed.y);
@@ -248,7 +248,7 @@ function createTrendChart() {
           ticks: {
             color: chartColours.text,
             callback: function(value) {
-              return '€' + value.toLocaleString('en-GB');
+              return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
             }
           },
           grid: {

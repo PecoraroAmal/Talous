@@ -42,8 +42,18 @@ const load=()=>{
   fillAll();render();
 };
 const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const f=n=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'EUR'}).format(n);
-const d=s=>new Date(s).toLocaleDateString('en-GB');
+const f=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n);
+const d=s=>new Date(s).toLocaleDateString('it-IT');
+
+// Parse amounts written as 1.234,56 or 1234.56 safely
+const parseEU=(val)=>{
+  if(typeof val==='number') return val;
+  let s=(val||'').toString().trim();
+  // Remove thousand separators (.) and convert decimal comma to dot
+  s=s.replace(/\./g,'').replace(',', '.');
+  const n=parseFloat(s);
+  return isNaN(n)?0:n;
+};
 
 const fillAll=()=>{
   const opts=store.accounts.map(a=>`<option value="${a.id}">${e(a.name)}</option>`).join('');
@@ -123,7 +133,7 @@ const genDates=(start,end,freq,wd,dom,m,d)=>{
 const saveTxn=e=>{
   e.preventDefault();
   const type=document.getElementById('type').value;
-  const amount=parseFloat(document.getElementById('amount').value);
+  const amount=parseEU(document.getElementById('amount').value);
   const date=document.getElementById('date').value;
   const rec=document.getElementById('recurring').value;
   const start=document.getElementById('start').value||date;

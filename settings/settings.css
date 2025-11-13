@@ -96,7 +96,7 @@ h2 {
 .section-description {
   font-size: 13px;
   opacity: 0.6;
-  line-height: 2.4;
+  line-height: 3.0;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -213,6 +213,12 @@ footer {
 }
 
 #message-ok-btn {
+  background: var(--positive, #22c55e);
+  color: #fff;
+}
+
+/* Make Confirm button use the same positive color as OK */
+#confirm-accept-btn {
   background: var(--positive, #22c55e);
   color: #fff;
 }
