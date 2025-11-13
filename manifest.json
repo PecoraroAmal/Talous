@@ -1,9 +1,9 @@
 {
   "id": "talous.app",
-  "name": "Talous",
-  "short_name": "Talous",
+  "name": "Talous™",
+  "short_name": "Talous™",
   "description": "Offline-capable personal finance tracker: accounts, methods, goals, transactions.",
-  "start_url": "/Talous/index.html?v=3.3",
+  "start_url": "/Talous/index.html?v=4.0",
   "scope": "/Talous/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -17,9 +17,9 @@
     { "src": "/Talous/icons/favicon-96x96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
-    { "name": "Transactions", "url": "/Talous/transactions/transactions.html?v=3.3", "description": "Add or view transactions" },
-    { "name": "Charts", "url": "/Talous/charts/charts.html?v=3.3", "description": "Visualise finances" },
-    { "name": "Goals", "url": "/Talous/tools/tools.html?v=3.3", "description": "Manage accounts & goals" }
+    { "name": "Transactions", "url": "/Talous/transactions/transactions.html?v=4.0", "description": "Add or view transactions" },
+    { "name": "Charts", "url": "/Talous/charts/charts.html?v=4.0", "description": "Visualise finances" },
+    { "name": "Goals", "url": "/Talous/tools/tools.html?v=4.0", "description": "Manage accounts & goals" }
   ],
   "categories": ["finance", "productivity"]
 }
