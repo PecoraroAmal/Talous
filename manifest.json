@@ -1,61 +1,32 @@
 {
-  "name": "Talous",
+  "name": "Talous™",
   "short_name": "Talous",
-  "description": "A minimalist offline personal finance tracker inspired by Trade Republic",
-  "start_url": "/Talous/",
-  "scope": "/Talous/",
+  "start_url": "/Talous/index.html?v=4.4",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "categories": ["productivity", "finance"],
-
-  "shortcuts": [
-    {
-      "name": "Add Transaction",
-      "short_name": "Add",
-      "description": "Add a new transaction",
-      "url": "/Talous/transactions/transactions.html?add=1",
-      "icons": [
-        {
-          "src": "/Talous/icons/favicon-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-
+  "background_color": "#f8f9fa",
+  "theme_color": "#339966",
+  "description": "A secure web application for managing passwords, cards, and digital wallets.",
   "icons": [
     {
-      "src": "/Talous/icons/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Talous/icons/web-app-manifest-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Talous/icons/web-app-manifest-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Talous/icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/Talous/icons/favicon-96x96.png",
+      "src": "/Talous/assets/favicon-96x96.png",
       "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
+    },
+    {
+      "src": "/Talous/assets/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Talous/assets/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/Talous/assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
-  ]
+  ],
+  "scope": "/Talous/"
 }
