@@ -1,6 +1,6 @@
 // index.js - Dashboard logic
 
-import { SAMPLE_DATA } from './example/example.js';
+import { MINIMAL_DATA } from './example/minimal.js';
 
 // Data structure (new schema compatible)
 let data = {
@@ -21,8 +21,8 @@ function loadData() {
       console.error('Error loading data:', e);
     }
   } else {
-    // Initialize with sample data if no data exists
-    data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
+    // Initialize with minimal data if no data exists
+    data = JSON.parse(JSON.stringify(MINIMAL_DATA)); // Deep copy
     saveData();
   }
   updateBalance();

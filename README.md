@@ -38,7 +38,8 @@ Talous/
 │  └─ settings.js
 │
 └─ example/
-   └─ example.js        # Sample data loaded on first visit
+  ├─ minimal.js        # Minimal data loaded on first visit
+  └─ example.js        # Rich sample data (download from Settings)
 ```
 
 ## Features
@@ -53,7 +54,7 @@ Talous/
 
 - Storage: browser `localStorage` under key `talousData`
 - No backend; no data leaves your device
-- First visit seeds optional sample data from `example/example.js`
+- First visit seeds minimal data from `example/minimal.js` (Settings → Sample downloads `example/example.js`)
 
 ### Data model (simplified)
 ```

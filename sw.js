@@ -1,4 +1,4 @@
-const APP_VERSION = 'v2.3';
+const APP_VERSION = 'v2.4';
 const CACHE_NAME = `talous-cache-${APP_VERSION}`;
 const urlsToCache = [
   `/Talous/index.html?${APP_VERSION}`,
@@ -24,6 +24,7 @@ const urlsToCache = [
   `/Talous/tools/tools.js?${APP_VERSION}`,
   `/Talous/settings/settings.js?${APP_VERSION}`,
   `/Talous/example/example.js?${APP_VERSION}`,
+  `/Talous/example/minimal.js?${APP_VERSION}`,
   // Icons
   `/Talous/icons/favicon.svg?${APP_VERSION}`,
   `/Talous/icons/web-app-manifest-192x192.png?${APP_VERSION}`,

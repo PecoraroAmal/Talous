@@ -1,6 +1,7 @@
 // settings.js - Settings page logic
 
 import { SAMPLE_DATA } from '../example/example.js';
+import { MINIMAL_DATA } from '../example/minimal.js';
 
 let data = {
   transactions: [],
@@ -38,8 +39,8 @@ function loadData() {
       console.error('Error loading data:', e);
     }
   } else {
-    // Initialize with sample data if no data exists
-    data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
+    // Initialize with minimal data if no data exists
+    data = JSON.parse(JSON.stringify(MINIMAL_DATA)); // Deep copy
     saveData();
   }
 }
@@ -274,7 +275,7 @@ loadData();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Talous/sw.js?v=2.3')
+  navigator.serviceWorker.register('/Talous/sw.js?v=2.4')
     .then(reg => console.log('Settings SW registered', reg.scope))
     .catch(err => console.warn('Settings SW registration failed', err));
 }

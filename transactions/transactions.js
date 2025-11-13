@@ -1,4 +1,4 @@
-import { SAMPLE_DATA } from '../example/example.js';
+import { MINIMAL_DATA } from '../example/minimal.js';
 
 const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactions:[]};
 let edit=null;
@@ -31,8 +31,8 @@ const load=()=>{
     store.categories=p.categories||{income:[],expense:[]};
     store.transactions=p.transactions||[];
   }catch{} else {
-    // Initialize with sample data if no data exists
-    const p = SAMPLE_DATA;
+    // Initialize with minimal data if no data exists
+    const p = MINIMAL_DATA;
     store.accounts=p.banks||[];
     store.methods=p.paymentMethods||[];
     store.categories=p.categories||{income:[],expense:[]};
