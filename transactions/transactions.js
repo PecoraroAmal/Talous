@@ -287,6 +287,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const cats=[...store.categories.income,...store.categories.expense].map(c=>c.name);
   document.getElementById('filter-cat').innerHTML='<option value="">All Categories</option>'+cats.map(n=>`<option>${e(n)}</option>`).join('');
 
+  // Filters and search should re-render the table on change/input
+  document.getElementById('search').addEventListener('input', render);
+  document.getElementById('filter-type').addEventListener('change', render);
+  document.getElementById('filter-cat').addEventListener('change', render);
+
   const t=document.getElementById('theme-toggle');
   const saved=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',saved);
