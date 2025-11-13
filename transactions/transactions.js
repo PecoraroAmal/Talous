@@ -4,7 +4,12 @@ const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactio
 let edit=null;
 
 const id=()=>Date.now().toString(36)+Math.random().toString(36).substr(2);
-const save=()=>{console.log('Saving to localStorage');const d=JSON.parse(localStorage.getItem('talousData')||'{}');d.transactions=store.transactions;localStorage.setItem('talousData',JSON.stringify(d));console.log('Saved');};
+const save=()=>{
+  const d=JSON.parse(localStorage.getItem('talousData')||'{}');
+  d.transactions=store.transactions;
+  localStorage.setItem('talousData',JSON.stringify(d));
+  console.log('Saved transactions:', store.transactions.length);
+};
 const load=()=>{
   const s=localStorage.getItem('talousData');
   if(s)try{const p=JSON.parse(s);
@@ -161,7 +166,6 @@ const saveTxn=e=>{
   if(error) return;
   if(edit)store.transactions=store.transactions.filter(t=>t.id!==edit.id);
   store.transactions.push(...txns);
-  console.log('Saving transaction:', txns);
   save();render();closeModal();
 };
 
