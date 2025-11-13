@@ -26,39 +26,39 @@ const { CacheableResponsePlugin } = workbox.cacheableResponse;
 // ---------------------------------------------------------------------
 const PRECACHE_MANIFEST = [
   // Core pages
-  { url: '/', revision: null },
-  { url: '/index.html', revision: null },
-  { url: '/index.css', revision: null },
-  { url: '/index.js', revision: null },
-  { url: '/style.css', revision: null },
+  { url: '/Talous/', revision: null },
+  { url: '/Talous/index.html', revision: null },
+  { url: '/Talous/index.css', revision: null },
+  { url: '/Talous/index.js', revision: null },
+  { url: '/Talous/style.css', revision: null },
 
   // Sections
-  { url: '/transactions/transactions.html', revision: null },
-  { url: '/transactions/transactions.css', revision: null },
-  { url: '/transactions/transactions.js', revision: null },
+  { url: '/Talous/transactions/transactions.html', revision: null },
+  { url: '/Talous/transactions/transactions.css', revision: null },
+  { url: '/Talous/transactions/transactions.js', revision: null },
 
-  { url: '/charts/charts.html', revision: null },
-  { url: '/charts/charts.css', revision: null },
-  { url: '/charts/charts.js', revision: null },
+  { url: '/Talous/charts/charts.html', revision: null },
+  { url: '/Talous/charts/charts.css', revision: null },
+  { url: '/Talous/charts/charts.js', revision: null },
 
-  { url: '/tools/tools.html', revision: null },
-  { url: '/tools/tools.css', revision: null },
-  { url: '/tools/tools.js', revision: null },
+  { url: '/Talous/tools/tools.html', revision: null },
+  { url: '/Talous/tools/tools.css', revision: null },
+  { url: '/Talous/tools/tools.js', revision: null },
 
-  { url: '/settings/settings.html', revision: null },
-  { url: '/settings/settings.css', revision: null },
-  { url: '/settings/settings.js', revision: null },
+  { url: '/Talous/settings/settings.html', revision: null },
+  { url: '/Talous/settings/settings.css', revision: null },
+  { url: '/Talous/settings/settings.js', revision: null },
 
   // Misc
-  { url: '/example/example.js', revision: null },
-  { url: '/manifest.json', revision: null },
+  { url: '/Talous/example/example.js', revision: null },
+  { url: '/Talous/manifest.json', revision: null },
 
   // Icons (only the ones used in the manifest)
-  { url: '/icons/favicon.svg', revision: null },
-  { url: '/icons/web-app-manifest-192x192.png', revision: null },
-  { url: '/icons/web-app-manifest-512x512.png', revision: null },
-  { url: '/icons/apple-touch-icon.png', revision: null },
-  { url: '/icons/favicon-96x96.png', revision: null }
+  { url: '/Talous/icons/favicon.svg', revision: null },
+  { url: '/Talous/icons/web-app-manifest-192x192.png', revision: null },
+  { url: '/Talous/icons/web-app-manifest-512x512.png', revision: null },
+  { url: '/Talous/icons/apple-touch-icon.png', revision: null },
+  { url: '/Talous/icons/favicon-96x96.png', revision: null }
 ];
 
 precacheAndRoute(PRECACHE_MANIFEST);
