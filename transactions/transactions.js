@@ -16,6 +16,13 @@ const save=()=>{
   localStorage.setItem('talousData',JSON.stringify(next));
   console.log('Saved transactions:', store.transactions.length);
 };
+const setRequired=(id, req)=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(req) el.setAttribute('required','required'); else el.removeAttribute('required');
+};
+
+// (removed erroneous duplicate updateUI)
 const load=()=>{
   const s=localStorage.getItem('talousData');
   if(s)try{const p=JSON.parse(s);
@@ -66,6 +73,16 @@ const updateUI=()=>{
   if(catSel.previousElementSibling) catSel.previousElementSibling.style.display=type==='transfer'?'none':'block';
   if(type==='transfer') catSel.removeAttribute('required');
   else catSel.setAttribute('required','required');
+  // Toggle field requirements by type to avoid hidden required blocking submit
+  setRequired('source', type==='income');
+  const singleOn = (type==='income' || type==='expense');
+  setRequired('acc', singleOn);
+  setRequired('method', singleOn);
+  const transferOn = (type==='transfer');
+  setRequired('from-acc', transferOn);
+  setRequired('from-method', transferOn);
+  setRequired('to-acc', transferOn);
+  setRequired('to-method', transferOn);
   document.getElementById('recurring-fields').classList.toggle('hidden',rec==='none');
   document.getElementById('weekly').classList.toggle('hidden',rec!=='weekly');
   document.getElementById('monthly').classList.toggle('hidden',rec!=='monthly');
