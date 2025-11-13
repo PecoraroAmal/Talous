@@ -1,32 +1,25 @@
 {
-  "name": "Talous™",
+  "id": "talous.app",
+  "name": "Talous – Personal Finance Tracker",
   "short_name": "Talous",
-  "start_url": "/Talous/index.html?v=4.4",
+  "description": "Offline-capable personal finance tracker: accounts, methods, goals, transactions.",
+  "start_url": "/Talous/index.html?v=2.1",
+  "scope": "/Talous/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#f8f9fa",
   "theme_color": "#339966",
-  "description": "A secure web application for managing passwords, cards, and digital wallets.",
+  "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "/Talous/assets/favicon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/Talous/assets/web-app-manifest-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/Talous/assets/web-app-manifest-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    },
-    {
-      "src": "/Talous/assets/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    }
+    { "src": "/Talous/icons/web-app-manifest-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/Talous/icons/web-app-manifest-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/Talous/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "/Talous/icons/favicon-96x96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" }
   ],
-  "scope": "/Talous/"
+  "shortcuts": [
+    { "name": "Transactions", "url": "/Talous/transactions/transactions.html?v=2.1", "description": "Add or view transactions" },
+    { "name": "Charts", "url": "/Talous/charts/charts.html?v=2.1", "description": "Visualise finances" },
+    { "name": "Goals", "url": "/Talous/tools/tools.html?v=2.1", "description": "Manage accounts & goals" }
+  ],
+  "categories": ["finance", "productivity"]
 }

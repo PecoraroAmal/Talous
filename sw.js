@@ -1,46 +1,37 @@
-const CACHE_NAME = 'talous-cache-v1.0';
+const APP_VERSION = 'v2.1';
+const CACHE_NAME = `talous-cache-${APP_VERSION}`;
 const urlsToCache = [
-  '/Talous/index.html?v=1.0',
-  '/Talous/manifest.json?v=1.0',
-  '/Talous/sw.js?v=1.0',
-  '/Talous/pages/banks.html?v=1.0',
-  '/Talous/pages/charts.html?v=1.0',
-  '/Talous/pages/cookies.html?v=1.0',
-  '/Talous/pages/goals.html?v=1.0',
-  '/Talous/pages/recurring.html?v=1.0',
-  '/Talous/pages/settings.html?v=1.0',
-  '/Talous/pages/transactions.html?v=1.0',
-  '/Talous/src/css/style.css?v=1.0',
-  '/Talous/src/css/pages/banks.css?v=1.0',
-  '/Talous/src/css/pages/charts.css?v=1.0',
-  '/Talous/src/css/pages/dashboard.css?v=1.0',
-  '/Talous/src/css/pages/goals.css?v=1.0',
-  '/Talous/src/css/pages/recurring.css?v=1.0',
-  '/Talous/src/css/pages/settings.css?v=1.0',
-  '/Talous/src/css/pages/transactions.css?v=1.0',
-  '/Talous/src/js/app.js?v=1.0',
-  '/Talous/src/js/charts.js?v=1.0',
-  '/Talous/src/js/storage.js?v=1.0',
-  '/Talous/src/js/ui.js?v=1.0',
-  '/Talous/src/js/utils.js?v=1.0',
-  '/Talous/src/js/pages/banks.js?v=1.0',
-  '/Talous/src/js/pages/charts-app.js?v=1.0',
-  '/Talous/src/js/pages/charts.js?v=1.0',
-  '/Talous/src/js/pages/dashboard.js?v=1.0',
-  '/Talous/src/js/pages/goals.js?v=1.0',
-  '/Talous/src/js/pages/recurring.js?v=1.0',
-  '/Talous/src/js/pages/settings.js?v=1.0',
-  '/Talous/src/js/pages/transactions.js?v=1.0',
-  '/Talous/example/example.js?v=1.0',
-  '/Talous/src/icons/site.webmanifest?v=1.0',
-  '/Talous/icons/favicon.svg?v=1.0',
-  '/Talous/icons/web-app-manifest-192x192.png?v=1.0',
-  '/Talous/icons/web-app-manifest-512x512.png?v=1.0',
-  '/Talous/icons/apple-touch-icon.png?v=1.0',
-  '/Talous/icons/favicon-96x96.png?v=1.0',
+  `/Talous/index.html?${APP_VERSION}`,
+  `/Talous/manifest.json?${APP_VERSION}`,
+  `/Talous/sw.js?${APP_VERSION}`,
+  // Core styles/scripts (adjust paths as needed)
+  `/Talous/style.css?${APP_VERSION}`,
+  `/Talous/index.css?${APP_VERSION}`,
+  // Feature pages
+  `/Talous/transactions/transactions.html?${APP_VERSION}`,
+  `/Talous/charts/charts.html?${APP_VERSION}`,
+  `/Talous/tools/tools.html?${APP_VERSION}`,
+  `/Talous/settings/settings.html?${APP_VERSION}`,
+  // Page-specific styles
+  `/Talous/transactions/transactions.css?${APP_VERSION}`,
+  `/Talous/charts/charts.css?${APP_VERSION}`,
+  `/Talous/tools/tools.css?${APP_VERSION}`,
+  `/Talous/settings/settings.css?${APP_VERSION}`,
+  // Scripts
+  `/Talous/index.js?${APP_VERSION}`,
+  `/Talous/transactions/transactions.js?${APP_VERSION}`,
+  `/Talous/charts/charts.js?${APP_VERSION}`,
+  `/Talous/tools/tools.js?${APP_VERSION}`,
+  `/Talous/settings/settings.js?${APP_VERSION}`,
+  `/Talous/example/example.js?${APP_VERSION}`,
+  // Icons
+  `/Talous/icons/favicon.svg?${APP_VERSION}`,
+  `/Talous/icons/web-app-manifest-192x192.png?${APP_VERSION}`,
+  `/Talous/icons/web-app-manifest-512x512.png?${APP_VERSION}`,
+  `/Talous/icons/apple-touch-icon.png?${APP_VERSION}`,
+  `/Talous/icons/favicon-96x96.png?${APP_VERSION}`,
+  // External CDNs (no versioning)
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js'
 ];
@@ -80,24 +71,29 @@ self.addEventListener('activate', event => {
 
 // Fetch event: Serve from cache or fetch from network
 self.addEventListener('fetch', event => {
-  console.log('Service Worker: Fetching', event.request.url);
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // If resource is in cache, return it
-        if (cachedResponse) {
-          // Try to fetch a fresh version in the background
-          fetchAndUpdateCache(event.request);
-          return cachedResponse;
-        }
-        // If not in cache, fetch from network and cache
-        return fetchAndUpdateCache(event.request);
-      })
-      .catch(error => {
-        console.error('Fetch failed:', error);
-        return caches.match('/Talous/index.html?v=1.0');
-      })
-  );
+  const { request } = event;
+  // Normalise index.html requests stripping query for fallback
+  const url = new URL(request.url);
+  const isHTML = request.destination === 'document';
+  event.respondWith((async () => {
+    try {
+      // Try cache first for static assets & HTML shell
+      const cached = await caches.match(request);
+      if (cached) {
+        // Background refresh (non-blocking)
+        fetchAndUpdateCache(request);
+        return cached;
+      }
+      const network = await fetchAndUpdateCache(request);
+      return network;
+    } catch (err) {
+      console.warn('Offline fallback triggered:', err);
+      if (isHTML) {
+        return (await caches.match(`/Talous/index.html?${APP_VERSION}`)) || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
+      }
+      return new Response('', { status: 504 });
+    }
+  })());
 });
 
 // Function to fetch from network and update cache
@@ -117,10 +113,10 @@ async function fetchAndUpdateCache(request) {
   }
 }
 
+// Notify clients of updates
 self.addEventListener('controllerchange', () => {
   console.log('Service Worker: New controller activated');
-  // Assuming showMessage is available in the app
-  if (typeof showMessage !== 'undefined') {
-    showMessage('Talous update!', 'success');
-  }
+  self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(clients => {
+    clients.forEach(client => client.postMessage({ type: 'SW_UPDATED', version: APP_VERSION }));
+  });
 });

@@ -274,5 +274,34 @@ loadData();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+  navigator.serviceWorker.register('/Talous/sw.js?v=2.0')
+    .then(reg => console.log('Settings SW registered', reg.scope))
+    .catch(err => console.warn('Settings SW registration failed', err));
+}
+
+// If user wants the download button to install the PWA instead of exporting data:
+const downloadBtn = document.getElementById('download-btn');
+if (downloadBtn) {
+  downloadBtn.addEventListener('click', async (ev) => {
+    // If install prompt available, use it; else fall back to JSON download
+    if (deferredInstallPrompt) {
+      ev.preventDefault();
+      try {
+        await deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          await showMessage({ title: 'Installed', message: 'App installed successfully.', okText: 'OK' });
+        } else {
+          await showMessage({ title: 'Dismissed', message: 'Install dismissed.', okText: 'OK' });
+        }
+      } catch (err) {
+        await showMessage({ title: 'Install Error', message: 'Unable to start installation.', okText: 'OK' });
+      } finally {
+        deferredInstallPrompt = null;
+      }
+    } else {
+      // fallback to original download behavior
+      downloadJSON();
+    }
+  }, { once: true }); // ensure we don't double-bind original listener
 }

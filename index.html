@@ -2,7 +2,7 @@
 <html lang="en-GB" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=2.0">
+  <meta name="viewport" content="width=device-width, initial-scale=2.1">
   <meta name="theme-color" content="#000000">
   <title>Talous - Dashboard</title>
   <link rel="icon" type="image/png" href="/Talous/icons/favicon-96x96.png" sizes="96x96" />
@@ -11,21 +11,25 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/Talous/icons/apple-touch-icon.png" />
   <link rel="manifest" href="/Talous/icons/site.webmanifest" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="/Talous/style.css?v=2.0">
-  <link rel="stylesheet" href="/Talous/index.css?v=2.0">
+  <link rel="stylesheet" href="/Talous/style.css?v=2.1">
+  <link rel="stylesheet" href="/Talous/index.css?v=2.1">
   <script>
-        if (window.location.pathname + window.location.search !== '/Talous/index.html?v=2.0') {
-            window.location.replace('/Talous/index.html?v=2.0');
-        }
+    // Optional: ensure canonical versioned URL (can be removed later)
+    if (window.location.pathname + window.location.search !== '/Talous/index.html?v=2.1') {
+      // Do not hard redirect if offline; allow PWA shell to load
+      if (navigator.onLine) {
+        window.location.replace('/Talous/index.html?v=2.1');
+      }
+    }
     </script>
 </head>
 <body>
   <nav class="app-nav">
-    <a href="/Talous/index.html?v=2.0" class="active" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
-    <a href="/Talous/transactions/transactions.html?v=2.0" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
-    <a href="/Talous/charts/charts.html?v=2.0" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
-    <a href="/Talous/tools/tools.html?v=2.0" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
-    <a href="/Talous/settings/settings.html?v=2.0" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+    <a href="/Talous/index.html?v=2.1" class="active" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/Talous/transactions/transactions.html?v=2.1" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/Talous/charts/charts.html?v=2.1" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/Talous/tools/tools.html?v=2.1" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/Talous/settings/settings.html?v=2.1" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
   </nav>
 
   <div class="container">
@@ -91,6 +95,29 @@
     </div>
   </div>
 
-  <script type="module" src="/Talous/index.js?v=2.0"></script>
+  <script type="module" src="/Talous/index.js?v=2.1"></script>
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Talous/sw.js?v=2.1')
+          .then(reg => {
+            console.log('SW registered', reg.scope);
+          })
+          .catch(err => console.error('SW registration failed', err));
+      });
+      navigator.serviceWorker.addEventListener('message', evt => {
+        if (evt.data && evt.data.type === 'SW_UPDATED') {
+          console.log('New version available:', evt.data.version);
+          // Simple toast message
+          const msgEl = document.createElement('div');
+          msgEl.textContent = 'Update available. Refresh for ' + evt.data.version;
+          msgEl.style.cssText = 'position:fixed;bottom:15px;right:15px;background:#339966;color:#fff;padding:10px 16px;border-radius:6px;font-size:14px;z-index:9999;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)';
+          msgEl.onclick = () => window.location.reload();
+          document.body.appendChild(msgEl);
+        }
+      });
+    }
+  </script>
 </body>
 </html>
