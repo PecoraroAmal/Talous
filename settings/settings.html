@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talous - Settings</title>
+  <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+  <link rel="shortcut icon" href="/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/icons/site.webmanifest" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/settings/settings.css">
+</head>
+<body>
+  <nav class="app-nav">
+    <a href="/index.html" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/transactions/transactions.html" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/charts/charts.html" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/tools/tools.html" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/settings/settings.html" class="active" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Settings</h1>
+    </header>
+
+    <main>
+      <!-- Theme Settings -->
+      <section class="theme-section">
+        <h2>Appearance</h2>
+        <button id="toggle-theme-btn" class="theme-btn">
+          <i class="fa-solid fa-sun" id="theme-icon"></i>
+        </button>
+        <p class="theme-description">Switch between light and dark theme</p>
+      </section>
+
+      <!-- Data Management -->
+      <section class="data-management">
+        <h2>Data Management</h2>
+        <div class="data-section">
+          <input type="file" id="upload-input" accept=".json" style="display: none;">
+          <div class="action-group">
+            <button id="upload-btn" class="action-btn" title="Upload JSON">
+              <i class="fa-solid fa-upload"></i>
+            </button>
+            <span class="action-label">Upload</span>
+          </div>
+          <div class="action-group">
+            <button id="download-btn" class="action-btn" title="Download JSON">
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <span class="action-label">Download</span>
+          </div>
+          <div class="action-group">
+            <button id="download-sample-btn" class="action-btn" title="Sample Data">
+              <i class="fa-solid fa-file-arrow-down"></i>
+            </button>
+            <span class="action-label">Sample</span>
+          </div>
+          <div class="action-group">
+            <button id="clear-btn" class="action-btn delete-btn" title="Clear All Data">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+            <span class="action-label">Clear</span>
+          </div>
+        </div>
+        <p class="section-description">Import, export, or reset your financial data. All data is stored locally on your device.</p>
+      </section>
+
+      <!-- Information Section -->
+      <section class="info-section">
+        <h2>Information</h2>
+        <div class="info-cards">
+          <div class="info-card" id="privacy-card">
+            <i class="fa-solid fa-shield-halved"></i>
+            <h3>Privacy</h3>
+            <p>Your data stays on your device</p>
+          </div>
+          <div class="info-card" id="how-card">
+            <i class="fa-solid fa-circle-info"></i>
+            <h3>How it Works</h3>
+            <p>Learn about the app features</p>
+          </div>
+          <div class="info-card" onclick="window.open('https://github.com/PecoraroAmal/Talous', '_blank')">
+            <i class="fa-brands fa-github"></i>
+            <h3>GitHub</h3>
+            <p>View source code</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer Links -->
+      <footer>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=5Z5N9EBJERXC6" target="_blank" class="support-btn">Support</a>
+        <div style="margin-top:12px;">
+          <button id="install-pwa-btn" class="support-btn">
+            <i class="fa-solid fa-download"></i> Install App
+          </button>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Privacy Modal -->
+    <div id="privacy-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2>Cookie & Privacy Policy</h2>
+        <p>Talous stores all your data locally on your device using localStorage. No data is sent to any server.</p>
+        <p>This application does not use cookies for tracking or analytics. Only essential browser storage is used to save your data locally.</p>
+        <p>You can delete your data at any time using the "Clear All Data" button in Settings.</p>
+        <button id="close-privacy-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- How it Works Modal -->
+    <div id="how-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2>How it Works</h2>
+        <p>Talous is a 100% offline Progressive Web App (PWA) for managing your personal finances.</p>
+        <h3>Features:</h3>
+        <ul>
+          <li>Track income and expenses</li>
+          <li>View charts and analytics</li>
+          <li>Manage banks, wallets, and crypto wallets</li>
+          <li>Set and track saving goals</li>
+          <li>Import/export data via JSON</li>
+        </ul>
+        <h3>Data Storage:</h3>
+        <p>All data is stored locally in your browser's localStorage. You can export your data as a JSON file and import it on another device.</p>
+        <h3>Installing the App:</h3>
+        <p>This app can be installed on your device as a PWA. Look for the "Install" option in your browser menu.</p>
+        <button id="close-how-btn">Close</button>
+      </div>
+    </div>
+
+    <!-- Confirm Modal (generic) -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2 id="confirm-title">Confirm</h2>
+        <p id="confirm-message"></p>
+        <div class="modal-actions">
+          <button id="confirm-cancel-btn">Cancel</button>
+          <button id="confirm-accept-btn" class="primary">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Modal (OK only) -->
+    <div id="message-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2 id="message-title">Message</h2>
+        <p id="message-text"></p>
+        <div class="modal-actions">
+          <button id="message-ok-btn" class="primary">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/settings/settings.js"></script>
+</body>
+</html>

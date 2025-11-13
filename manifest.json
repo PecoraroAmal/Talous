@@ -1,5 +1,5 @@
 {
-  "name": "Talous - Personal Finance Tracker",
+  "name": "Talous",
   "short_name": "Talous",
   "description": "A minimalist offline personal finance tracker inspired by Trade Republic",
   "start_url": "/",
@@ -9,49 +9,53 @@
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "categories": ["productivity", "finance"],
+
   "shortcuts": [
     {
       "name": "Add Transaction",
       "short_name": "Add",
       "description": "Add a new transaction",
-      "url": "/?action=add-transaction",
+      "url": "/transactions/transactions.html?add=1",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23000000' width='192' height='192'/%3E%3Ctext x='50%' y='50%' dominantBaseline='middle' textAnchor='middle' fontSize='100' fontWeight='bold' fill='white'%3E+%3C/text%3E%3C/svg%3E",
-          "sizes": "192x192",
-          "type": "image/svg+xml"
+          "src": "/icons/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     }
   ],
+
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23000000' width='192' height='192'/%3E%3Ctext x='50%' y='50%' dominantBaseline='middle' textAnchor='middle' fontSize='100' fontWeight='bold' fill='white'%3E€%3C/text%3E%3C/svg%3E",
-      "sizes": "192x192",
+      "src": "/icons/favicon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23000000' width='192' height='192'/%3E%3Ctext x='50%' y='50%' dominantBaseline='middle' textAnchor='middle' fontSize='100' fontWeight='bold' fill='white'%3E€%3C/text%3E%3C/svg%3E",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect fill='%23f5f5f5' width='540' height='720'/%3E%3Crect fill='%23000000' width='540' height='60'/%3E%3Ctext x='20' y='40' fontSize='24' fontWeight='bold' fill='white'%3E€ Talous%3C/text%3E%3C/svg%3E",
-      "sizes": "540x720",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
-    }
-  ],
-  "screenshots_wide": [
-    {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'%3E%3Crect fill='%23f8fafc' width='1280' height='720'/%3E%3Crect fill='%231e3a8a' width='1280' height='60'/%3E%3Ctext x='20' y='40' fontSize='24' fontWeight='bold' fill='white'%3E€ Talous%3C/text%3E%3C/svg%3E",
-      "sizes": "1280x720",
-      "type": "image/svg+xml",
-      "form_factor": "wide"
+      "src": "/icons/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

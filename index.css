@@ -1,0 +1,56 @@
+/* index.css - Dashboard specific styles */
+
+.balance-card {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.balance {
+  font-size: 48px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+#add-transaction-btn {
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 300px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.transaction-list {
+  min-height: 200px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.transaction-date {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.transaction-amount {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Color amounts by type */
+.transaction-amount.income { color: var(--positive, #22c55e); }
+.transaction-amount.expense { color: var(--negative, #ef4444); }
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .balance { font-size:40px; }
+  .grid-2 { grid-template-columns:1fr; }
+}
+@media (max-width: 600px) {
+  #add-transaction-btn { max-width:100%; }
+  .transaction-item { flex-direction:column; align-items:flex-start; gap:4px; }
+  .balance { font-size:34px; }
+}

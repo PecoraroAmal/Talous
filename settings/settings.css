@@ -1,0 +1,230 @@
+/* settings.css - Settings page styles */
+
+main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+section {
+  margin-bottom: 60px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+/* Theme Section */
+.theme-section {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.theme-description {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.theme-btn {
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-size: 48px;
+  cursor: pointer;
+  padding: 20px;
+  transition: transform 0.2s;
+}
+
+.theme-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Data Management Section */
+.data-management {
+  text-align: center;
+}
+
+.data-section {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.action-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.action-label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.delete-btn {
+  color: var(--negative);
+}
+
+.section-description {
+  font-size: 13px;
+  opacity: 0.6;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Information Section */
+.info-section {
+  text-align: center;
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.info-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.info-card i {
+  font-size: 32px;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+.info-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.info-card p {
+  font-size: 13px;
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding-top: 40px;
+}
+
+.support-btn {
+  display: inline-block;
+  background: #003580;
+  color: white;
+  padding: 12px 40px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.support-btn:hover {
+  background: #002960;
+  transform: translateY(-2px);
+}
+
+/* Modal Content */
+.modal-content ul {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.modal-content li {
+  margin-bottom: 8px;
+}
+
+.modal-content button {
+  margin-top: 20px;
+}
+
+/* Modal actions layout */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.modal-actions .primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.modal-actions button:not(.primary) {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+/* Green actions for positive flows (Import, OK) */
+.modal-actions .positive {
+  background: var(--positive, #22c55e);
+  color: #fff;
+}
+
+#message-ok-btn {
+  background: var(--positive, #22c55e);
+  color: #fff;
+}
+
+/* Responsive settings page */
+@media (max-width: 900px) {
+  main { padding:30px 16px; }
+  .info-cards { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+  h2 { font-size:18px; }
+}
+@media (max-width: 600px) {
+  .action-btn { width:54px; height:54px; font-size:22px; }
+  .info-card { padding:24px 16px; }
+  .theme-btn { font-size:40px; }
+}

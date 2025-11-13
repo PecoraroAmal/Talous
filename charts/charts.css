@@ -1,0 +1,39 @@
+/* charts.css - Charts page styles */
+
+h2 {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+h2:first-of-type {
+  margin-top: 20px;
+}
+
+canvas {
+  max-height: 300px;
+}
+
+#trend-chart {
+  max-height: 400px;
+}
+
+.card h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Responsive charts page */
+@media (max-width: 900px) {
+  h2 { font-size:20px; }
+  .grid-2 { grid-template-columns:1fr; }
+  canvas { max-height:260px; }
+  #trend-chart { max-height:320px; }
+}
+@media (max-width: 600px) {
+  h2 { margin-top:30px; }
+  .card h3 { font-size:16px; }
+  canvas { max-height:220px; }
+}

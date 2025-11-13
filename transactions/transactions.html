@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talous - Transactions</title>
+  <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+  <link rel="shortcut icon" href="/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="/icons/site.webmanifest" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/transactions/transactions.css">
+</head>
+<body>
+  <nav class="app-nav">
+    <a href="/index.html" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/transactions/transactions.html" class="active" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/charts/charts.html" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/tools/tools.html" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/settings/settings.html" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+  </nav>
+
+  <div class="container">
+    <header><h1>Transactions</h1></header>
+
+    <main>
+      <div class="toolbar">
+        <button id="add-btn" class="btn-primary">+ Add Transaction</button>
+        <input type="text" id="search" placeholder="Search...">
+      </div>
+
+      <div class="filters">
+        <select id="filter-type"><option value="">All Types</option><option value="income">Income</option><option value="expense">Expense</option><option value="transfer">Transfer</option></select>
+        <select id="filter-cat"><option value="">All Categories</option></select>
+      </div>
+
+      <div class="card"><table id="table">
+        <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Account / Method</th><th>Category</th><th>Note</th><th></th></tr></thead>
+        <tbody id="body"></tbody>
+      </table></div>
+    </main>
+
+    <div id="modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2 id="title">Add Transaction</h2>
+        <form id="form">
+          <label>Type</label>
+          <select id="type" required>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+            <option value="transfer">Transfer</option>
+          </select>
+
+          <label>Amount</label>
+          <input type="number" id="amount" step="0.01" required>
+
+          <div id="income-fields">
+            <label>From (source)</label>
+            <input type="text" id="source" required>
+          </div>
+
+          <div id="single-fields">
+            <label>Account</label><select id="acc" required></select>
+            <label>Method</label><select id="method" required><option value="none">None</option></select>
+          </div>
+
+          <div id="transfer-fields" class="hidden">
+            <label>From Account</label><select id="from-acc" required></select>
+            <label>From Method</label><select id="from-method" required><option value="none">None</option></select>
+            <label>To Account</label><select id="to-acc" required></select>
+            <label>To Method</label><select id="to-method" required><option value="none">None</option></select>
+          </div>
+
+          <label>Category</label>
+          <select id="cat" required></select>
+
+          <label>Date</label>
+          <input type="date" id="date" required>
+
+          <label>Recurring</label>
+          <select id="recurring">
+            <option value="none">None</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+
+          <div id="recurring-fields" class="hidden">
+            <label>Start Date</label><input type="date" id="start">
+            <div id="weekly"><label>Weekday</label><select id="weekday">
+              <option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option>
+              <option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option>
+            </select></div>
+            <div id="monthly"><label>Day of Month</label><input type="number" id="day" min="1" max="31"></div>
+            <div id="yearly">
+              <label>Month</label><select id="month">
+                <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+              </select>
+              <label>Day</label><input type="number" id="yday" min="1" max="31">
+            </div>
+          </div>
+
+          <label>Note</label>
+          <textarea id="note" rows="2"></textarea>
+
+          <div class="modal-buttons">
+            <button type="submit" class="btn-primary">Save</button>
+            <button type="button" id="cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-overlay hidden">
+      <div class="modal-content confirm-modal">
+        <h2>Confirm Deletion</h2>
+        <p id="confirm-msg">Are you sure you want to delete this transaction?</p>
+        <div class="modal-buttons">
+          <button id="confirm-yes" class="btn-primary">Yes</button>
+          <button id="confirm-no">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="error-modal" class="modal-overlay hidden">
+      <div class="modal-content confirm-modal">
+        <h2>Error</h2>
+        <p id="error-msg">An error occurred.</p>
+        <div class="modal-buttons">
+          <button id="error-close" class="btn-primary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="message" class="message hidden"></div>
+
+  <script type="module" src="/transactions/transactions.js"></script>
+</body>
+</html>
