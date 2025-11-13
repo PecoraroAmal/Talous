@@ -1,5 +1,7 @@
 // charts.js - Charts page logic
 
+import { SAMPLE_DATA } from '../example/example.js';
+
 let data = {
   transactions: [],
   categories: { income: [], expense: [] },
@@ -15,6 +17,10 @@ function loadData() {
     } catch (e) {
       console.error('Error loading data:', e);
     }
+  } else {
+    // Initialize with sample data if no data exists
+    data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
+    localStorage.setItem('talousData', JSON.stringify(data));
   }
   renderCharts();
 }

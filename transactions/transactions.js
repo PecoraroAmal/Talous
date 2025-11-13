@@ -1,3 +1,5 @@
+import { SAMPLE_DATA } from '../example/example.js';
+
 const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactions:[]};
 let edit=null;
 
@@ -10,7 +12,15 @@ const load=()=>{
     store.methods=p.paymentMethods||[];
     store.categories=p.categories||{income:[],expense:[]};
     store.transactions=p.transactions||[];
-  }catch{}
+  }catch{} else {
+    // Initialize with sample data if no data exists
+    const p = SAMPLE_DATA;
+    store.accounts=p.banks||[];
+    store.methods=p.paymentMethods||[];
+    store.categories=p.categories||{income:[],expense:[]};
+    store.transactions=p.transactions||[];
+    save();
+  }
   fillAll();render();
 };
 const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));

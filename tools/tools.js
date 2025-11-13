@@ -1,5 +1,7 @@
 // tools.js - Tools page logic
 
+import { SAMPLE_DATA } from '../example/example.js';
+
 let data = {
   accounts: [],
   goals: [],
@@ -47,6 +49,14 @@ function loadData() {
     } catch (e) {
       console.error('Error loading data:', e);
     }
+  } else {
+    // Initialize with sample data if no data exists
+    const parsed = SAMPLE_DATA;
+    data.accounts = parsed.banks || [];
+    data.goals = parsed.goals || [];
+    data.categories = parsed.categories || { income: [], expense: [] };
+    data.paymentMethods = parsed.paymentMethods || [];
+    saveData();
   }
   renderAll();
 }

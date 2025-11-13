@@ -1,5 +1,7 @@
 // index.js - Dashboard logic
 
+import { SAMPLE_DATA } from './example/example.js';
+
 // Data structure (new schema compatible)
 let data = {
   transactions: [],
@@ -18,6 +20,10 @@ function loadData() {
     } catch (e) {
       console.error('Error loading data:', e);
     }
+  } else {
+    // Initialize with sample data if no data exists
+    data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
+    saveData();
   }
   updateBalance();
   renderRecentTransactions();
