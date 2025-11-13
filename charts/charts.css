@@ -29,11 +29,11 @@ canvas {
 @media (max-width: 900px) {
   h2 { font-size:20px; }
   .grid-2 { grid-template-columns:1fr; }
-  canvas { max-height:260px; }
-  #trend-chart { max-height:320px; }
+  canvas { max-height:260px; margin:0 auto; display:block; }
+  #trend-chart { max-height:320px; margin:0 auto; display:block; }
 }
 @media (max-width: 600px) {
   h2 { margin-top:30px; }
   .card h3 { font-size:16px; }
-  canvas { max-height:220px; }
+  canvas { max-height:220px; margin:0 auto; display:block; }
 }
