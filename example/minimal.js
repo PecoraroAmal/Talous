@@ -2,8 +2,8 @@
 
 export const MINIMAL_DATA = {
   banks: [
-    { id: 'acc_bank_main', name: 'Main Bank', type: 'bank', colour: '#2E86DE', currency: 'EUR' },
-    { id: 'acc_wallet', name: 'Cash Wallet', type: 'wallet_physical', colour: '#F39C12', currency: 'EUR' }
+    { id: 'acc_bank_main', name: 'Main Bank', type: 'bank', colour: '#2E86DE', currency: 'EUR', sharedBalance: true },
+    { id: 'acc_wallet', name: 'Cash Wallet', type: 'wallet_physical', colour: '#F39C12', currency: 'EUR', sharedBalance: false }
   ],
   paymentMethods: [
     { id: 'met_bank_bonifico', type: 'bank', name: 'Bonifico', accountId: 'acc_bank_main', colour: '#2E86DE' },

@@ -98,6 +98,7 @@ function renderAccounts() {
     const iconClass = getAccountIcon(account.type);
     const associatedMethods = data.paymentMethods.filter(method => method.accountId === account.id);
     const allowedTypes = getAllowedPaymentTypes(account.type);
+    const sharedBadge = account.sharedBalance ? '<span class="shared-badge" title="Shared Balance">Shared</span>' : '';
     
     const methodsHtml = associatedMethods.length > 0 
       ? `<div class="account-payment-methods">
@@ -123,7 +124,7 @@ function renderAccounts() {
       <div class="account-header">
         <i class="${iconClass}" style="color: ${account.colour}; font-size: 24px; margin-right: 10px;"></i>
         <div>
-          <h4>${account.name}</h4>
+          <h4>${account.name} ${sharedBadge}</h4>
           <span class="account-currency">${account.currency || 'EUR'}</span>
         </div>
       </div>
@@ -162,10 +163,12 @@ function showAccountModal(account = null) {
     document.getElementById('account-type').value = account.type;
     document.getElementById('account-name').value = account.name;
     document.getElementById('account-currency').value = account.currency || 'EUR';
+    document.getElementById('account-shared').value = account.sharedBalance ? 'yes' : 'no';
     document.getElementById('account-colour').value = account.colour;
   } else {
     form.reset();
     document.getElementById('account-currency').value = 'EUR';
+    document.getElementById('account-shared').value = 'no';
     document.getElementById('account-colour').value = '#2E86DE';
   }
   
@@ -185,6 +188,7 @@ function saveAccount(e) {
     type: document.getElementById('account-type').value,
     name: document.getElementById('account-name').value,
     currency: document.getElementById('account-currency').value,
+    sharedBalance: document.getElementById('account-shared').value === 'yes',
     colour: document.getElementById('account-colour').value
   };
   

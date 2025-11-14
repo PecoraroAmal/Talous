@@ -3,11 +3,11 @@
 export const SAMPLE_DATA = {
   // Accounts (banks)
   banks: [
-    { id: 'acc_bank_main', name: 'Main Bank', type: 'bank', colour: '#2E86DE', currency: 'EUR' },
-    { id: 'acc_wallet', name: 'Cash Wallet', type: 'wallet_physical', colour: '#F39C12', currency: 'EUR' },
-    { id: 'acc_wallet_online', name: 'Online Wallet', type: 'wallet_online', colour: '#003087', currency: 'EUR' },
-    { id: 'acc_crypto', name: 'Crypto Wallet', type: 'crypto', colour: '#F2A900', currency: 'BTC' },
-    { id: 'acc_piggy', name: 'Piggy Bank', type: 'piggy', colour: '#A3A3A3', currency: 'EUR' }
+    { id: 'acc_bank_main', name: 'Main Bank', type: 'bank', colour: '#2E86DE', currency: 'EUR', sharedBalance: true },
+    { id: 'acc_wallet', name: 'Cash Wallet', type: 'wallet_physical', colour: '#F39C12', currency: 'EUR', sharedBalance: false },
+    { id: 'acc_wallet_online', name: 'Online Wallet', type: 'wallet_online', colour: '#003087', currency: 'EUR', sharedBalance: false },
+    { id: 'acc_crypto', name: 'Crypto Wallet', type: 'crypto', colour: '#F2A900', currency: 'BTC', sharedBalance: false },
+    { id: 'acc_piggy', name: 'Piggy Bank', type: 'piggy', colour: '#A3A3A3', currency: 'EUR', sharedBalance: false }
   ],
 
   // Payment Methods (respect account-type constraints)

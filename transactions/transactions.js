@@ -104,12 +104,14 @@ const showMessage=(msg)=>{document.getElementById('error-msg').textContent=msg;d
 const hideError=()=>{document.getElementById('error-modal').classList.add('hidden');};
 const balance=(accId,metId)=>{
   let b=0;
+  const acc=store.accounts.find(a=>a.id===accId);
+  const shared=acc?.sharedBalance;
   store.transactions.forEach(t=>{
-    if(t.type==='income'&&t.accountId===accId&&(t.methodId||'')===metId)b+=t.amount;
-    if(t.type==='expense'&&t.accountId===accId&&(t.methodId||'')===metId)b-=t.amount;
+    if(t.type==='income'&&t.accountId===accId&&(shared|| (t.methodId||'')===metId)) b+=t.amount;
+    if(t.type==='expense'&&t.accountId===accId&&(shared|| (t.methodId||'')===metId)) b-=t.amount;
     if(t.type==='transfer'){
-      if(t.fromAccountId===accId&&(t.fromMethodId||'')===metId)b-=t.amount;
-      if(t.toAccountId===accId&&(t.toMethodId||'')===metId)b+=t.amount;
+      if(t.fromAccountId===accId&&(shared|| (t.fromMethodId||'')===metId)) b-=t.amount;
+      if(t.toAccountId===accId&&(shared|| (t.toMethodId||'')===metId)) b+=t.amount;
     }
   });
   return b;

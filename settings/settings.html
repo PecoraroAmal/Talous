@@ -8,23 +8,23 @@
   <link rel="icon" type="image/svg+xml" href="/Talous/icons/favicon.svg" />
   <link rel="shortcut icon" href="/Talous/icons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Talous/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="/Talous/manifest.json?v=4.0" />
+  <link rel="manifest" href="/Talous/manifest.json?v=4.1" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="/Talous/style.css?v=4.0">
-  <link rel="stylesheet" href="/Talous/settings/settings.css?v=4.0">
+  <link rel="stylesheet" href="/Talous/style.css?v=4.1">
+  <link rel="stylesheet" href="/Talous/settings/settings.css?v=4.1">
   <script>
-      if (window.location.pathname + window.location.search !== '/Talous/settings/settings.html?v=4.0') {
-          window.location.replace('/Talous/settings/settings.html?v=4.0');
+      if (window.location.pathname + window.location.search !== '/Talous/settings/settings.html?v=4.1') {
+          window.location.replace('/Talous/settings/settings.html?v=4.1');
       }
   </script>
 </head>
 <body>
   <nav class="app-nav">
-    <a href="/Talous/index.html?v=4.0" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
-    <a href="/Talous/transactions/transactions.html?v=4.0" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
-    <a href="/Talous/charts/charts.html?v=4.0" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
-    <a href="/Talous/tools/tools.html?v=4.0" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
-    <a href="/Talous/settings/settings.html?v=4.0" class="active" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+    <a href="/Talous/index.html?v=4.1" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/Talous/transactions/transactions.html?v=4.1" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/Talous/charts/charts.html?v=4.1" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/Talous/tools/tools.html?v=4.1" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/Talous/settings/settings.html?v=4.1" class="active" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
   </nav>
 
   <div class="container">
@@ -105,7 +105,7 @@
             <i class="fa-solid fa-download"></i> Install App
           </button>
         </div>
-        <p>Version 4.0</p>
+        <p>Version 4.1</p>
         <br>
         <a href="https://pecoraroamal.github.io/Beskytter" target="_blank" rel="noopener">Beskytter™</a>
       </footer>
@@ -124,23 +124,69 @@
 
     <!-- How it Works Modal -->
     <div id="how-modal" class="modal-overlay hidden">
-      <div class="modal-content">
-        <h2>How it Works</h2>
-        <span class="how-badge" aria-label="Talous means economy">Talous means economy</span>
-        <p style="margin-top:14px">Talous™ is a 100% offline Progressive Web App (PWA) for managing your personal finances.</p>
-        <h3 style="margin-top:24px">Features:</h3>
-        <ul class="how-features">
-          <li>Track income and expenses</li>
-          <li>View charts and analytics</li>
-          <li>Manage banks, wallets, and crypto wallets</li>
-          <li>Set and track saving goals</li>
-          <li>Import/export data via JSON</li>
-        </ul>
-        <h3>Data Storage:</h3>
-        <p>All data is stored locally in your browser's localStorage. You can export your data as a JSON file and import it on another device.</p>
-        <h3>Installing the App:</h3>
-        <p>This app can be installed on your device as a PWA. Look for the "Install" option in your browser menu.</p>
-        <button id="close-how-btn">Close</button>
+      <div class="modal-content how-large">
+        <div class="how-header">
+          <h2>How it Works</h2>
+          <span class="how-badge" aria-label="Talous means economy">Talous means economy</span>
+        </div>
+        <p class="lead">Talous™ is an offline-first personal finance Progressive Web App designed for speed, privacy and control. Everything stays on your device unless you export it.</p>
+
+        <div class="how-grid">
+          <section>
+            <h3>Overview</h3>
+            <p>Talous lets you record income, expenses and transfers, manage multiple account types (banks, physical wallets, online wallets, crypto and piggy banks), define payment methods and track saving goals. Rich charts help you visualise where money comes from and where it goes.</p>
+          </section>
+          <section>
+            <h3>Core Concepts</h3>
+            <ul class="bullet-list">
+              <li><strong>Accounts:</strong> Containers of funds (e.g. Bank, Wallet, Crypto). Each has its own currency and colour.</li>
+              <li><strong>Shared Balance:</strong> When enabled for a bank account you can spend received funds using any method linked to that account (e.g. a €500 transfer usable via card or bank transfer).</li>
+              <li><strong>Payment Methods:</strong> Specific ways to move money (Card, Cash, Wallet, Crypto). Constrained by the account type for clarity.</li>
+              <li><strong>Transactions:</strong> Three types: Income (adds), Expense (subtracts), Transfer (moves between accounts).</li>
+              <li><strong>Categories:</strong> Classify income and expense for analytics (e.g. Salary, Dining, Transport).</li>
+              <li><strong>Goals:</strong> Target amounts with progress bars (e.g. New Car fund).</li>
+              <li><strong>Charts:</strong> Pie charts by category/payment type, holdings distribution and balance trend line.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>What You Can Do</h3>
+            <ul class="check-list">
+              <li>Add / edit accounts with colour, currency and shared balance flag.</li>
+              <li>Add payment methods restricted to suitable account types.</li>
+              <li>Record income, expenses and transfers (including recurring sequences).</li>
+              <li>Track saving goals and monitor percentage progress.</li>
+              <li>Filter, search and edit existing transactions quickly.</li>
+              <li>Analyse data with dynamic charts (categories, methods, holdings, trend).</li>
+              <li>Toggle theme (light/dark) and install as a PWA.</li>
+              <li>Export all data to JSON, import on another device, or reset locally.</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Data & Privacy</h3>
+            <p>All information (accounts, methods, categories, goals, transactions and settings) is stored in your browser's <code>localStorage</code>. No tracking, no analytics, no external requests beyond libraries you already loaded. You can purge everything with the Clear button or manually remove the storage entry.</p>
+            <p><strong>Offline:</strong> A service worker caches the app shell so you can open and use Talous without a network connection.</p>
+          </section>
+          <section>
+            <h3>Installation</h3>
+            <p>On compatible browsers a prompt or menu option lets you install Talous as an app. After installation it behaves like a native application with offline capability and faster launch.</p>
+          </section>
+          <section>
+            <h3>Data Formats</h3>
+            <p>Numbers use EU formatting (e.g. 100.000,00). Imports accept either “1.234,56” or “1234.56” automatically. Currencies follow the ISO code you assign to accounts.</p>
+          </section>
+          <section>
+            <h3>Tips</h3>
+            <ul class="bullet-list">
+              <li>Enable shared balance only when all methods truly access the same pool.</li>
+              <li>Keep categories concise; broad groups make charts easier to read.</li>
+              <li>Use transfers rather than income+expense pairs to move money internally.</li>
+              <li>Export periodically for an external backup.</li>
+            </ul>
+          </section>
+        </div>
+        <div class="how-footer">
+          <button id="close-how-btn" class="primary">Close</button>
+        </div>
       </div>
     </div>
 
@@ -168,6 +214,6 @@
     </div>
   </div>
 
-  <script type="module" src="/Talous/settings/settings.js?v=4.0"></script>
+  <script type="module" src="/Talous/settings/settings.js?v=4.1"></script>
 </body>
 </html>
