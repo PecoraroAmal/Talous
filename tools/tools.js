@@ -238,11 +238,13 @@ function renderGoals() {
   const items = data.goals.map(goal => {
     const progress = (goal.current / goal.target) * 100;
     const percentage = Math.min(progress, 100).toFixed(1);
+    const acc = data.accounts.find(a=>a.id===goal.accountId);
+    const cur = acc?.currency || '';
     return `
       <div class="goal-item" style="border-top-color: ${goal.colour};">
         <h4>${goal.name}</h4>
         <div class="goal-amounts">
-          <span>${formatCurrency(goal.current)}</span> / <span>${formatCurrency(goal.target)}</span>
+          <span>${formatNumber(goal.current)} ${cur}</span> / <span>${formatNumber(goal.target)} ${cur}</span>
         </div>
         <div class="progress-bar">
           <div class="progress-fill" style="width: ${percentage}%; background: ${goal.colour};"></div>
@@ -267,11 +269,15 @@ function showGoalModal(goal = null) {
   const form = document.getElementById('goal-form');
   const title = document.getElementById('goal-form-title');
   const deleteBtn = document.getElementById('delete-goal-btn');
+  // Populate account select
+  const accSel = document.getElementById('goal-account');
+  accSel.innerHTML = '<option value="">Select Account</option>' + (data.accounts||[]).map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
   
   title.textContent = goal ? 'Edit Goal' : 'Add Goal';
   deleteBtn.style.display = goal ? 'block' : 'none';
   
   if (goal) {
+    document.getElementById('goal-account').value = goal.accountId || '';
     document.getElementById('goal-name').value = goal.name;
     document.getElementById('goal-target').value = goal.target;
     document.getElementById('goal-current').value = goal.current;
@@ -280,6 +286,7 @@ function showGoalModal(goal = null) {
     document.getElementById('goal-colour').value = goal.colour;
   } else {
     form.reset();
+    document.getElementById('goal-account').value = '';
     document.getElementById('goal-current').value = 0;
     document.getElementById('goal-colour').value = '#2E86DE';
     document.getElementById('goal-start').value = new Date().toISOString().split('T')[0];
@@ -298,6 +305,7 @@ function saveGoal(e) {
   
   const goal = {
     id: editingGoal?.id || generateId(),
+    accountId: document.getElementById('goal-account').value,
     name: document.getElementById('goal-name').value,
     target: parseAmountEU(document.getElementById('goal-target').value),
     current: parseAmountEU(document.getElementById('goal-current').value),
@@ -305,6 +313,7 @@ function saveGoal(e) {
     targetDate: document.getElementById('goal-end').value,
     colour: document.getElementById('goal-colour').value
   };
+  if (!goal.accountId){ alert('Please select an associated account for the goal.'); return; }
   
   if (editingGoal) {
     const index = data.goals.findIndex(g => g.id === editingGoal.id);
@@ -648,11 +657,8 @@ window.editPaymentMethod = function(id) {
 };
 
 // Helper functions
-function formatCurrency(amount) {
-  return new Intl.NumberFormat('it-IT', { 
-    style: 'currency', 
-    currency: 'EUR' 
-  }).format(amount);
+function formatNumber(amount) {
+  return new Intl.NumberFormat('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
 }
 
 function formatDate(dateStr) {

@@ -6,7 +6,8 @@ let data = {
   transactions: [],
   categories: { income: [], expense: [] },
   paymentMethods: [],
-  banks: []
+  banks: [],
+  recurringRules: []
 };
 
 function loadData() {
@@ -22,7 +23,66 @@ function loadData() {
     data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
     localStorage.setItem('talousData', JSON.stringify(data));
   }
+  applyRecurringDue();
   renderCharts();
+}
+
+function nextMonthlyDate(fromDate, day){
+  const cur = new Date(fromDate);
+  cur.setMonth(cur.getMonth()+1);
+  const max = new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate();
+  cur.setDate(Math.min(day, max));
+  return cur.toISOString().split('T')[0];
+}
+
+function applyRecurringDue(){
+  if (!Array.isArray(data.recurringRules) || data.recurringRules.length===0) return;
+  const today = new Date().toISOString().split('T')[0];
+  let added = false;
+  const balanceOn=(txs,acc,met)=>{
+    let b=0; const a=(data.banks||[]).find(x=>x.id===acc); const shared=a?.sharedBalance;
+    txs.forEach(t=>{ if (t.toGoalId) return; if(t.type==='income'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b+=t.amount; if(t.type==='expense'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b-=t.amount; if(t.type==='transfer'){ if(t.fromAccountId===acc&&(shared||(t.fromMethodId||'')===met)) b-=t.amount; if(t.toAccountId===acc&&(shared||(t.toMethodId||'')===met)) b+=t.amount; } }); return b; };
+  const accountBalanceOn=(txs,acc)=>{ let b=0; txs.forEach(t=>{ if (t.toGoalId) return; if(t.type==='income'&&t.accountId===acc) b+=t.amount; if(t.type==='expense'&&t.accountId===acc) b-=t.amount; if(t.type==='transfer'){ if(t.fromAccountId===acc) b-=t.amount; if(t.toAccountId===acc) b+=t.amount; } }); return b; };
+  data.recurringRules.forEach(rule=>{
+    let last = rule.lastApplied || rule.startDate;
+    if (!last) return;
+    let next = last;
+    while (next <= today){
+      if (rule.frequency==='monthly'){
+        next = nextMonthlyDate(next, parseInt(rule.day||'1',10)||1);
+      } else if (rule.frequency==='weekly'){
+        const dt = new Date(next); dt.setDate(dt.getDate()+7); next = dt.toISOString().split('T')[0];
+      } else if (rule.frequency==='yearly'){
+        const dt = new Date(next); dt.setFullYear(dt.getFullYear()+1); next = dt.toISOString().split('T')[0];
+      } else { break; }
+      if (next>today) break;
+      const pending = data.transactions.slice();
+      if (rule.type==='income'){
+        data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'income', amount: rule.amount, date: next, accountId: rule.accountId, methodId: rule.methodId||'', category: rule.category||'', note: rule.note||'', source: rule.source||'' });
+        added = true; rule.lastApplied = next;
+      } else if (rule.type==='expense'){
+        if (balanceOn(pending, rule.accountId, rule.methodId||'') >= rule.amount){
+          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'expense', amount: rule.amount, date: next, accountId: rule.accountId, methodId: rule.methodId||'', category: rule.category||'', note: rule.note||'' });
+          added = true; rule.lastApplied = next;
+        } else { break; }
+      } else if (rule.type==='transfer'){
+        if (balanceOn(pending, rule.fromAccountId, rule.fromMethodId||'') < rule.amount) { break; }
+        if (rule.toGoalId){
+          const g = (data.goals||[]).find(x=>x.id===rule.toGoalId);
+          if (!g || g.accountId!==rule.toAccountId) { break; }
+          const destAvail = accountBalanceOn(pending, rule.toAccountId);
+          if ((g.current||0) + rule.amount > destAvail) { break; }
+          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'transfer', amount: rule.amount, date: next, note: rule.note||'', category: '', fromAccountId: rule.fromAccountId, fromMethodId: rule.fromMethodId||'', toAccountId: rule.toAccountId, toMethodId: rule.toMethodId||'', toGoalId: rule.toGoalId });
+          g.current = (g.current||0) + rule.amount;
+          added = true; rule.lastApplied = next;
+        } else {
+          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'transfer', amount: rule.amount, date: next, note: rule.note||'', category: '', fromAccountId: rule.fromAccountId, fromMethodId: rule.fromMethodId||'', toAccountId: rule.toAccountId, toMethodId: rule.toMethodId||'' });
+          added = true; rule.lastApplied = next;
+        }
+      }
+    }
+  });
+  if (added) localStorage.setItem('talousData', JSON.stringify(data));
 }
 
 // Get chart colours based on theme
@@ -105,6 +165,7 @@ function computeHoldings() {
     } else if (t.type === 'expense') {
       if (t.accountId) byAccount[t.accountId] = (byAccount[t.accountId] || 0) - t.amount;
     } else if (t.type === 'transfer') {
+      if (t.toGoalId) return; // goal earmarks do not change holdings
       if (t.fromAccountId) byAccount[t.fromAccountId] = (byAccount[t.fromAccountId] || 0) - t.amount;
       if (t.toAccountId) byAccount[t.toAccountId] = (byAccount[t.toAccountId] || 0) + t.amount;
     }
@@ -171,10 +232,7 @@ function createPieChart(canvasId, data, title) {
           callbacks: {
             label: function(context) {
               const label = context.label || '';
-              const value = new Intl.NumberFormat('it-IT', { 
-                style: 'currency', 
-                currency: 'EUR' 
-              }).format(context.parsed);
+              const value = new Intl.NumberFormat('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(context.parsed);
               return `${label}: ${value}`;
             }
           }
@@ -229,10 +287,7 @@ function createTrendChart() {
         tooltip: {
           callbacks: {
             label: function(context) {
-              return new Intl.NumberFormat('it-IT', { 
-                style: 'currency', 
-                currency: 'EUR' 
-              }).format(context.parsed.y);
+              return new Intl.NumberFormat('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(context.parsed.y);
             }
           }
         }
@@ -250,7 +305,7 @@ function createTrendChart() {
           ticks: {
             color: chartColours.text,
             callback: function(value) {
-              return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
+              return new Intl.NumberFormat('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
             }
           },
           grid: {

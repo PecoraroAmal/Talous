@@ -60,7 +60,7 @@ export const SAMPLE_DATA = {
 
   // Saving goals (unchanged, examples)
   goals: [
-    { id: 'g1', name: 'Holiday Fund', target: 2000, current: 450, startDate: '2025-01-01', targetDate: '2025-12-31', colour: '#FF7F50' },
-    { id: 'g2', name: 'Emergency Fund', target: 5000, current: 1200, startDate: '2025-01-01', targetDate: '2026-12-31', colour: '#2E86DE' }
+    { id: 'g1', accountId: 'acc_bank_main', name: 'Holiday Fund', target: 2000, current: 450, startDate: '2025-01-01', targetDate: '2025-12-31', colour: '#FF7F50' },
+    { id: 'g2', accountId: 'acc_wallet', name: 'Emergency Fund', target: 5000, current: 1200, startDate: '2025-01-01', targetDate: '2026-12-31', colour: '#2E86DE' }
   ]
 };

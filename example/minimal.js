@@ -32,6 +32,6 @@ export const MINIMAL_DATA = {
     { id: 't_tv', type: 'expense', amount: 10000, date: '2025-11-05', accountId: 'acc_bank_main', methodId: 'met_card_visa', category: 'Electronics', note: 'High-end TV' }
   ],
   goals: [
-    { id: 'g_new_car', name: 'New Car', target: 800000, current: 500000, startDate: '2025-01-01', targetDate: '2026-12-31', colour: '#FF7F50' }
+    { id: 'g_new_car', accountId: 'acc_bank_main', name: 'New Car', target: 800000, current: 500000, startDate: '2025-01-01', targetDate: '2026-12-31', colour: '#FF7F50' }
   ]
 };

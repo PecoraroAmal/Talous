@@ -1,6 +1,6 @@
 import { MINIMAL_DATA } from '../example/minimal.js';
 
-const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactions:[]};
+const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactions:[],goals:[],recurringRules:[]};
 let edit=null;
 
 const id=()=>Date.now().toString(36)+Math.random().toString(36).substr(2);
@@ -11,7 +11,9 @@ const save=()=>{
     banks: store.accounts,
     paymentMethods: store.methods,
     categories: store.categories,
-    transactions: store.transactions
+    transactions: store.transactions,
+    goals: store.goals,
+    recurringRules: store.recurringRules
   };
   localStorage.setItem('talousData',JSON.stringify(next));
   console.log('Saved transactions:', store.transactions.length);
@@ -30,6 +32,8 @@ const load=()=>{
     store.methods=p.paymentMethods||[];
     store.categories=p.categories||{income:[],expense:[]};
     store.transactions=p.transactions||[];
+    store.goals=p.goals||[];
+    store.recurringRules=p.recurringRules||[];
   }catch{} else {
     // Initialize with minimal data if no data exists
     const p = MINIMAL_DATA;
@@ -37,12 +41,15 @@ const load=()=>{
     store.methods=p.paymentMethods||[];
     store.categories=p.categories||{income:[],expense:[]};
     store.transactions=p.transactions||[];
+    store.goals=p.goals||[];
+    store.recurringRules=p.recurringRules||[];
     save();
   }
+  applyRecurringDue();
   fillAll();render();
 };
 const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const f=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n);
+const f=n=>new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 const d=s=>new Date(s).toLocaleDateString('it-IT');
 
 // Parse amounts written as 1.234,56 or 1234.56 safely
@@ -93,6 +100,22 @@ const updateUI=()=>{
   setRequired('from-method', transferOn);
   setRequired('to-acc', transferOn);
   setRequired('to-method', transferOn);
+  // Goal destination UI
+  const toGoal = document.getElementById('to-goal');
+  const goalWrap = document.getElementById('goal-dest');
+  const toMethod = document.getElementById('to-method');
+  if (type==='transfer') {
+    if (toGoal && toGoal.checked) {
+      goalWrap.classList.remove('hidden');
+      toMethod.setAttribute('disabled','disabled');
+    } else {
+      goalWrap.classList.add('hidden');
+      toMethod.removeAttribute('disabled');
+    }
+  } else {
+    goalWrap && goalWrap.classList.add('hidden');
+    toMethod && toMethod.removeAttribute('disabled');
+  }
   document.getElementById('recurring-fields').classList.toggle('hidden',rec==='none');
   document.getElementById('weekly').classList.toggle('hidden',rec!=='weekly');
   document.getElementById('monthly').classList.toggle('hidden',rec!=='monthly');
@@ -107,11 +130,27 @@ const balance=(accId,metId)=>{
   const acc=store.accounts.find(a=>a.id===accId);
   const shared=acc?.sharedBalance;
   store.transactions.forEach(t=>{
+    if (t.toGoalId) return; // goal earmark transfers do not affect balances
     if(t.type==='income'&&t.accountId===accId&&(shared|| (t.methodId||'')===metId)) b+=t.amount;
     if(t.type==='expense'&&t.accountId===accId&&(shared|| (t.methodId||'')===metId)) b-=t.amount;
     if(t.type==='transfer'){
       if(t.fromAccountId===accId&&(shared|| (t.fromMethodId||'')===metId)) b-=t.amount;
       if(t.toAccountId===accId&&(shared|| (t.toMethodId||'')===metId)) b+=t.amount;
+    }
+  });
+  return b;
+};
+
+// Account-wide balance ignoring method (used for goal constraints)
+const accountBalance=(accId)=>{
+  let b=0;
+  store.transactions.forEach(t=>{
+    if (t.toGoalId) return; // ignore goal earmarks
+    if(t.type==='income'&&t.accountId===accId) b+=t.amount;
+    if(t.type==='expense'&&t.accountId===accId) b-=t.amount;
+    if(t.type==='transfer'){
+      if(t.fromAccountId===accId) b-=t.amount;
+      if(t.toAccountId===accId) b+=t.amount;
     }
   });
   return b;
@@ -132,6 +171,91 @@ const genDates=(start,end,freq,wd,dom,m,d)=>{
   return out;
 };
 
+function nextMonthlyDate(fromDate, day){
+  const cur = new Date(fromDate);
+  cur.setMonth(cur.getMonth()+1);
+  const max = new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate();
+  cur.setDate(Math.min(day, max));
+  return cur.toISOString().split('T')[0];
+}
+
+function applyRecurringDue(){
+  if (!Array.isArray(store.recurringRules) || store.recurringRules.length===0) return;
+  const today = new Date().toISOString().split('T')[0];
+  let newTxns = [];
+  const balanceOn=(txs,acc,met)=>{
+    let b=0; const a=store.accounts.find(x=>x.id===acc); const shared=a?.sharedBalance;
+    txs.forEach(t=>{
+      if (t.toGoalId) return;
+      if(t.type==='income'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b+=t.amount;
+      if(t.type==='expense'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b-=t.amount;
+      if(t.type==='transfer'){
+        if(t.fromAccountId===acc&&(shared||(t.fromMethodId||'')===met)) b-=t.amount;
+        if(t.toAccountId===acc&&(shared||(t.toMethodId||'')===met)) b+=t.amount;
+      }
+    });
+    return b;
+  };
+  const accountBalanceOn=(txs,acc)=>{
+    let b=0; txs.forEach(t=>{ if (t.toGoalId) return; if(t.type==='income'&&t.accountId===acc) b+=t.amount; if(t.type==='expense'&&t.accountId===acc) b-=t.amount; if(t.type==='transfer'){ if(t.fromAccountId===acc) b-=t.amount; if(t.toAccountId===acc) b+=t.amount; } }); return b;
+  };
+  store.recurringRules.forEach(rule=>{
+    let last = rule.lastApplied || rule.startDate;
+    if (!last) return;
+    // Move to next expected occurrence after lastApplied
+    let next = last;
+    while (next <= today){
+      // advance to next first; avoid duplicating lastApplied itself
+      if (rule.frequency==='monthly'){
+        next = nextMonthlyDate(next, parseInt(rule.day||'1',10)||1);
+      } else if (rule.frequency==='weekly'){
+        const dt = new Date(next); dt.setDate(dt.getDate()+7); next = dt.toISOString().split('T')[0];
+      } else if (rule.frequency==='yearly'){
+        const dt = new Date(next); dt.setFullYear(dt.getFullYear()+1); next = dt.toISOString().split('T')[0];
+      } else {
+        break;
+      }
+      if (next>today) break;
+      const pending = store.transactions.concat(newTxns);
+      if (rule.type==='income'){
+        const base={ id:id(), type:'income', amount:rule.amount, date:next, note:rule.note||'', category:rule.category||'', accountId:rule.accountId, methodId:rule.methodId||'', source:rule.source||'' };
+        newTxns.push(base);
+        rule.lastApplied = next;
+      } else if (rule.type==='expense'){
+        const avail = balanceOn(pending, rule.accountId, rule.methodId||'');
+        if (avail >= rule.amount){
+          const base={ id:id(), type:'expense', amount:rule.amount, date:next, note:rule.note||'', category:rule.category||'', accountId:rule.accountId, methodId:rule.methodId||'' };
+          newTxns.push(base);
+          rule.lastApplied = next;
+        } else {
+          break; // stop advancing until funds exist
+        }
+      } else if (rule.type==='transfer'){
+        const availFrom = balanceOn(pending, rule.fromAccountId, rule.fromMethodId||'');
+        if (availFrom < rule.amount) { break; }
+        if (rule.toGoalId){
+          const g = store.goals.find(x=>x.id===rule.toGoalId);
+          if (!g || g.accountId!==rule.toAccountId) { break; }
+          const destAvail = accountBalanceOn(pending, rule.toAccountId);
+          if ((g.current||0) + rule.amount > destAvail) { break; }
+          const base={ id:id(), type:'transfer', amount:rule.amount, date:next, note:rule.note||'', category:'', fromAccountId:rule.fromAccountId, fromMethodId:rule.fromMethodId||'', toAccountId:rule.toAccountId, toMethodId:rule.toMethodId||'', toGoalId: rule.toGoalId };
+          newTxns.push(base);
+          g.current = (g.current||0) + rule.amount;
+          rule.lastApplied = next;
+        } else {
+          const base={ id:id(), type:'transfer', amount:rule.amount, date:next, note:rule.note||'', category:'', fromAccountId:rule.fromAccountId, fromMethodId:rule.fromMethodId||'', toAccountId:rule.toAccountId, toMethodId:rule.toMethodId||'' };
+          newTxns.push(base);
+          rule.lastApplied = next;
+        }
+      }
+    }
+  });
+  if (newTxns.length){
+    store.transactions.push(...newTxns);
+    save();
+  }
+}
+
 const saveTxn=e=>{
   e.preventDefault();
   const type=document.getElementById('type').value;
@@ -146,6 +270,20 @@ const saveTxn=e=>{
     if(!fromAcc||!toAcc){ showMessage('Transfer requires both source and destination.'); return; }
     if(fromAcc===toAcc){ showMessage('Transfer blocked: source and destination cannot be the same.'); return; }
     if(!(amount>0)){ showMessage('Amount must be greater than zero.'); return; }
+    // Goal destination validations
+    const toGoal = document.getElementById('to-goal').checked;
+    if (toGoal) {
+      const goalId = document.getElementById('goal-select').value;
+      if (!goalId) { showMessage('Please select a goal.'); return; }
+      const goal = store.goals.find(g=>g.id===goalId);
+      if (!goal) { showMessage('Invalid goal selected.'); return; }
+      if (goal.accountId !== toAcc) { showMessage('Selected goal must belong to the destination account.'); return; }
+      const availDest = accountBalance(toAcc);
+      if (goal.current + amount > availDest) {
+        showMessage(`Deposit exceeds available balance of destination account (${f(availDest)} ${accountCurrency(toAcc)}).`);
+        return;
+      }
+    }
   }
   let dates=rec==='none'?[date]:genDates(start,today,rec,
     document.getElementById('weekday').value,
@@ -171,7 +309,7 @@ const saveTxn=e=>{
       const fromMet=document.getElementById('from-method').value||'';
       const avail=balance(from,fromMet);
       if(avail<amount){
-        showMessage(`Transfer blocked: ${f(avail)} available in ${label(from,fromMet)}; need ${f(amount)}.`);
+        showMessage(`Transfer blocked: ${f(avail)} ${accountCurrency(from)} available in ${label(from,fromMet)}; need ${f(amount)} ${accountCurrency(from)}.`);
         error=true; return;
       }
     }
@@ -194,6 +332,10 @@ const saveTxn=e=>{
       { const v=document.getElementById('from-method').value; base.fromMethodId=(v==='none')?'':v; }
       base.toAccountId=document.getElementById('to-acc').value;
       { const v=document.getElementById('to-method').value; base.toMethodId=(v==='none')?'':v; }
+      const toGoal = document.getElementById('to-goal').checked;
+      if (toGoal) {
+        base.toGoalId = document.getElementById('goal-select').value;
+      }
     }
     txns.push(base);
   });
@@ -201,8 +343,67 @@ const saveTxn=e=>{
   if(error) return;
   if(edit)store.transactions=store.transactions.filter(t=>t.id!==edit.id);
   store.transactions.push(...txns);
+  // If any transfer to goal, update goal.current
+  txns.forEach(t=>{
+    if (t.type==='transfer' && t.toGoalId){
+      const g=store.goals.find(x=>x.id===t.toGoalId);
+      if (g){ g.current = (g.current||0) + t.amount; }
+    }
+  });
+  // Persist recurring rule for future auto-application
+  if (rec!=='none'){
+    const lastGen = dates[dates.length-1];
+    const rule = buildRecurringRuleFromForm(lastGen);
+    upsertRecurringRule(rule);
+  }
   save();render();closeModal();
 };
+
+function buildRecurringRuleFromForm(lastApplied){
+  const type=document.getElementById('type').value;
+  const base={
+    id: id(),
+    type,
+    amount: parseEU(document.getElementById('amount').value),
+    category: type==='transfer' ? '' : document.getElementById('cat').value,
+    note: document.getElementById('note').value||'',
+    frequency: document.getElementById('recurring').value,
+    startDate: document.getElementById('start').value || document.getElementById('date').value,
+    weekday: document.getElementById('weekday').value,
+    day: document.getElementById('day').value,
+    month: document.getElementById('month').value,
+    yday: document.getElementById('yday').value,
+    lastApplied
+  };
+  if (type==='income' || type==='expense'){
+    base.accountId=document.getElementById('acc').value; base.methodId=document.getElementById('method').value||''; if (type==='income') base.source=document.getElementById('source').value||'';
+  } else if (type==='transfer'){
+    base.fromAccountId=document.getElementById('from-acc').value; base.fromMethodId=document.getElementById('from-method').value||'';
+    base.toAccountId=document.getElementById('to-acc').value; base.toMethodId=document.getElementById('to-method').value||'';
+    if (document.getElementById('to-goal').checked){ base.toGoalId = document.getElementById('goal-select').value; }
+  }
+  return base;
+}
+
+function upsertRecurringRule(rule){
+  // Simple de-duplication by signature
+  const sig = JSON.stringify({
+    t:rule.type,a:rule.accountId,fa:rule.fromAccountId,ta:rule.toAccountId,m:rule.methodId,fm:rule.fromMethodId,tm:rule.toMethodId,tg:rule.toGoalId||'',c:rule.category,amt:rule.amount,f:rule.frequency,d:rule.day,wd:rule.weekday,mo:rule.month,yd:rule.yday
+  });
+  let found = -1;
+  for (let i=0;i<store.recurringRules.length;i++){
+    const r=store.recurringRules[i];
+    const rSig = JSON.stringify({t:r.type,a:r.accountId,fa:r.fromAccountId,ta:r.toAccountId,m:r.methodId,fm:r.fromMethodId,tm:r.toMethodId,tg:r.toGoalId||'',c:r.category,amt:r.amount,f:r.frequency,d:r.day,wd:r.weekday,mo:r.month,yd:r.yday});
+    if (rSig===sig){ found=i; break; }
+  }
+  if (found>=0){
+    // Update lastApplied and startDate (keep earliest)
+    store.recurringRules[found].lastApplied = rule.lastApplied;
+    if (new Date(rule.startDate) < new Date(store.recurringRules[found].startDate)) store.recurringRules[found].startDate = rule.startDate;
+  } else {
+    store.recurringRules.push(rule);
+  }
+}
 
 const render=()=>{
   const q=document.getElementById('search').value.toLowerCase();
@@ -226,13 +427,14 @@ const render=()=>{
   body.innerHTML=list.map(x=>{
     const color=x.type==='income'?'amount-income':x.type==='expense'?'amount-expense':'amount-transfer';
     const icon=x.type==='income'?'<i class="fa-solid fa-arrow-down"></i>':x.type==='expense'?'<i class="fa-solid fa-arrow-up"></i>':'<i class="fa-solid fa-right-left"></i>';
-    const method=x.type==='transfer'
-      ?`${label(x.fromAccountId,x.fromMethodId)} → ${label(x.toAccountId,x.toMethodId)}`
-      :label(x.accountId,x.methodId);
+    const method = (x.type==='transfer')
+      ? (x.toGoalId ? `${label(x.fromAccountId,x.fromMethodId)} → Goal: ${goalName(x.toGoalId)} (Deposit)` : `${label(x.fromAccountId,x.fromMethodId)} → ${label(x.toAccountId,x.toMethodId)}`)
+      : label(x.accountId,x.methodId);
+    const amountCurrency = x.type==='transfer' ? accountCurrency(x.fromAccountId) : accountCurrency(x.accountId);
     return `<tr>
       <td>${d(x.date)}</td>
       <td><span class="type-${x.type}">${icon} ${x.type}</span></td>
-      <td class="${color}">${f(x.amount)}</td>
+      <td class="${color}">${f(x.amount)} ${amountCurrency}</td>
       <td><strong>${method||'-'}</strong></td>
       <td><u>${x.category||'-'}</u></td>
       <td>${e(x.note||'')}</td>
@@ -245,6 +447,16 @@ const label=(accId,metId)=>{
   const a=store.accounts.find(x=>x.id===accId);
   const m=store.methods.find(x=>x.id===metId);
   return a?(m?`${a.name} · ${m.name}`:a.name):'';
+};
+
+const goalName=(goalId)=>{
+  const g=store.goals.find(x=>x.id===goalId);
+  return g?g.name:'Goal';
+};
+
+const accountCurrency=(accId)=>{
+  const a=store.accounts.find(x=>x.id===accId);
+  return a?.currency||'';
 };
 
 const openModal=(txn=null)=>{
@@ -272,6 +484,18 @@ const openModal=(txn=null)=>{
       document.getElementById('to-acc').value=txn.toAccountId||'';
       fillMethods('to-acc','to-method');
       document.getElementById('to-method').value=txn.toMethodId||'';
+      // Populate goal controls when editing goal earmark
+      const toGoalEl = document.getElementById('to-goal');
+      if (txn.toGoalId) {
+        toGoalEl.checked = true;
+        updateUI();
+        populateGoalsForAccount();
+        const goalSel = document.getElementById('goal-select');
+        goalSel.value = txn.toGoalId;
+      } else {
+        toGoalEl.checked = false;
+        updateUI();
+      }
     }
   }
   updateUI();
@@ -292,6 +516,15 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('type').onchange=updateUI;
   document.getElementById('recurring').onchange=updateUI;
   ['acc','from-acc','to-acc'].forEach(id=>document.getElementById(id).onchange=()=>fillMethods(id,id.replace('acc','method')));
+  // Populate goals when destination account changes
+  document.getElementById('to-acc').addEventListener('change', ()=>{
+    populateGoalsForAccount();
+  });
+  // Toggle goal UI
+  document.getElementById('to-goal').addEventListener('change', ()=>{
+    updateUI();
+    if (document.getElementById('to-goal').checked) populateGoalsForAccount();
+  });
   document.getElementById('confirm-yes').onclick=confirmYes;
   document.getElementById('confirm-no').onclick=hideConfirm;
   document.getElementById('error-close').onclick=hideError;
@@ -319,3 +552,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const params=new URLSearchParams(location.search);
   if(params.has('add')) openModal();
 });
+
+function populateGoalsForAccount(){
+  const toAcc = document.getElementById('to-acc').value;
+  const sel = document.getElementById('goal-select');
+  if (!sel) return;
+  const goals = store.goals.filter(g=>g.accountId===toAcc);
+  sel.innerHTML = '<option value="">Select Goal</option>' + goals.map(g=>`<option value="${g.id}">${e(g.name)}</option>`).join('');
+}
