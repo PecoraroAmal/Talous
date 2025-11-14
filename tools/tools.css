@@ -86,20 +86,13 @@
 }
 
 /* Shared balance badge */
-.shared-badge {
-  display:inline-block;
-  margin-left:6px;
-  font-size:10px;
-  font-weight:600;
-  letter-spacing:.5px;
-  padding:3px 8px;
-  border-radius:999px;
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.3);
-  box-shadow:0 2px 4px rgba(0,0,0,.25);
-  text-transform:uppercase;
+.shared-indicator {
+  margin: -4px 0 6px;
+  font-size: 12px;
+  opacity: .85;
 }
+.shared-indicator i.fa-arrows-rotate { color:#16a34a; }
+.shared-indicator i.fa-ban { color:#dc2626; }
 
 .account-payment-methods {
   margin-top: 15px;

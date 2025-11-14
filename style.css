@@ -32,7 +32,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--fg);
-  line-height: 4.1;
+  line-height: 4.2;
   padding-top: 60px;
   transition: padding 0.3s ease;
 }
@@ -70,9 +70,21 @@ body {
 .app-nav a.active, .app-nav a:hover { opacity:1; background: var(--border); }
 
 @media (max-width: 640px) {
-  body { padding-top: 0; padding-bottom: 62px; }
-  .app-nav { top: auto; bottom: 0; border-bottom: none; border-top:1px solid var(--border); justify-content: space-around; }
-  .app-nav a { font-size: 20px; }
+  body { padding-top: 0; padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .app-nav { 
+    top: auto; 
+    bottom: 0; 
+    height: 78px; 
+    border-bottom: none; 
+    border-top:1px solid var(--border); 
+    justify-content: space-around; 
+    padding: 10px calc(16px + env(safe-area-inset-left)) calc(10px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-right));
+  }
+  .app-nav a { 
+    font-size: 26px; 
+    width: 56px; 
+    height: 56px; 
+  }
 }
 
 /* Legacy sidebar removed */

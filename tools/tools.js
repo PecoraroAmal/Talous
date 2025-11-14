@@ -98,7 +98,9 @@ function renderAccounts() {
     const iconClass = getAccountIcon(account.type);
     const associatedMethods = data.paymentMethods.filter(method => method.accountId === account.id);
     const allowedTypes = getAllowedPaymentTypes(account.type);
-    const sharedBadge = account.sharedBalance ? '<span class="shared-badge" title="Shared Balance">Shared</span>' : '';
+    const sharedIcon = account.sharedBalance
+      ? '<div class="shared-indicator" title="Shared Balance"><i class="fa-solid fa-arrows-rotate"></i></div>'
+      : '<div class="shared-indicator" title="Not Shared"><i class="fa-solid fa-ban"></i></div>';
     
     const methodsHtml = associatedMethods.length > 0 
       ? `<div class="account-payment-methods">
@@ -124,7 +126,8 @@ function renderAccounts() {
       <div class="account-header">
         <i class="${iconClass}" style="color: ${account.colour}; font-size: 24px; margin-right: 10px;"></i>
         <div>
-          <h4>${account.name} ${sharedBadge}</h4>
+          <h4>${account.name}</h4>
+          ${sharedIcon}
           <span class="account-currency">${account.currency || 'EUR'}</span>
         </div>
       </div>

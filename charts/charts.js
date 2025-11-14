@@ -69,7 +69,9 @@ function categoryNameFor(txn, idx) {
 function methodTypeFor(txn, idx) {
   if (!txn || !txn.methodId) return 'Other';
   const m = idx.methods[txn.methodId];
-  return m?.type || 'Other';
+  const raw = m?.type || 'other';
+  const map = { card: 'Card', cash: 'Cash', wallet: 'Wallet', crypto: 'Crypto', other: 'Other' };
+  return map[raw] || (raw.charAt(0).toUpperCase() + raw.slice(1));
 }
 
 function aggregateByCategory(type) {
@@ -284,22 +286,6 @@ function renderCharts() {
 }
 
 // Theme toggle
-function toggleTheme() {
-  const html = document.documentElement;
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  
-  const themeBtn = document.getElementById('theme-toggle');
-  themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-  
-  // Reload charts with new theme
-  location.reload();
-}
-
-// Menu toggle
-// sidebar removed
 
 // Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
