@@ -1,4 +1,4 @@
-import { MINIMAL_DATA } from '../example/minimal.js';
+import { SAMPLE_DATA } from '../example/example.js';
 
 const store={accounts:[],methods:[],categories:{income:[],expense:[]},transactions:[],goals:[],recurringRules:[]};
 let edit=null;
@@ -35,8 +35,8 @@ const load=()=>{
     store.goals=p.goals||[];
     store.recurringRules=p.recurringRules||[];
   }catch{} else {
-    // Initialize with minimal data if no data exists
-    const p = MINIMAL_DATA;
+    // Initialize with sample data if no data exists
+    const p = SAMPLE_DATA;
     store.accounts=p.banks||[];
     store.methods=p.paymentMethods||[];
     store.categories=p.categories||{income:[],expense:[]};
@@ -45,14 +45,14 @@ const load=()=>{
     store.recurringRules=p.recurringRules||[];
     save();
   }
-  applyRecurringDue();
+  // applyRecurringDue();
   fillAll();render();
 };
 const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const f=n=>new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 const d=s=>new Date(s).toLocaleDateString('it-IT');
 
-// Parse amounts written as 1.234,56 or 1234.56 safely
+// Parse amounts written as 1.234,56 or 1234.66 safely
 const parseEU=(val)=>{
   if(typeof val==='number') return val;
   let s=(val||'').toString().trim();
@@ -398,7 +398,6 @@ const openModal=(txn=null)=>{
   document.getElementById('title').textContent=txn?'Edit':'Add';
   document.getElementById('form').reset();
   document.getElementById('date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('start').value=document.getElementById('date').value;
   fillAll();updateUI();
   if(txn){
     document.getElementById('type').value=txn.type;
@@ -466,7 +465,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('filter-cat').innerHTML='<option value="">All Categories</option>'+cats.map(n=>`<option>${e(n)}</option>`).join('');
 
   // Tab navigation for type filter
-  let activeTypeFilter = '';
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
