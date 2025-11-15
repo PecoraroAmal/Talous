@@ -9,7 +9,9 @@ let data = {
     income: [],
     expense: []
   },
-  paymentMethods: []
+  paymentMethods: [],
+  recurringPayments: [],
+  transactions: []
 };
 
 let pendingDelete = null; // { type: 'account'|'goal'|'category', item: object, callback: function }
@@ -46,6 +48,8 @@ function loadData() {
       data.goals = parsed.goals || [];
       data.categories = parsed.categories || { income: [], expense: [] };
       data.paymentMethods = parsed.paymentMethods || [];
+      data.recurringPayments = parsed.recurringPayments || [];
+      data.transactions = parsed.transactions || [];
     } catch (e) {
       console.error('Error loading data:', e);
     }
@@ -56,6 +60,8 @@ function loadData() {
     data.goals = parsed.goals || [];
     data.categories = parsed.categories || { income: [], expense: [] };
     data.paymentMethods = parsed.paymentMethods || [];
+    data.recurringPayments = parsed.recurringPayments || [];
+    data.transactions = parsed.transactions || [];
     saveData();
   }
   renderAll();
@@ -68,6 +74,8 @@ function saveData() {
   fullData.goals = data.goals;
   fullData.categories = data.categories;
   fullData.paymentMethods = data.paymentMethods;
+  fullData.recurringPayments = data.recurringPayments;
+  fullData.transactions = data.transactions;
   localStorage.setItem('talousData', JSON.stringify(fullData));
 }
 
@@ -78,6 +86,7 @@ function generateId() {
 // Render all sections
 function renderAll() {
   renderAccounts();
+  renderRecurringPayments();
   renderGoals();
   renderCategories();
   // Payment methods rendering removed
@@ -98,9 +107,10 @@ function renderAccounts() {
     const iconClass = getAccountIcon(account.type);
     const associatedMethods = data.paymentMethods.filter(method => method.accountId === account.id);
     const allowedTypes = getAllowedPaymentTypes(account.type);
+    const balance = computeAccountBalance(account.id);
     const sharedIcon = account.sharedBalance
-      ? '<div class="shared-indicator" title="Shared Balance"><i class="fa-solid fa-arrows-rotate"></i></div>'
-      : '<div class="shared-indicator" title="Not Shared"><i class="fa-solid fa-ban"></i></div>';
+      ? '<i class="fa-solid fa-arrows-rotate" style="color:var(--color-positive);" title="Shared"></i>'
+      : '<i class="fa-solid fa-ban" style="color:var(--color-negative);" title="Not Shared"></i>';
     
     const methodsHtml = associatedMethods.length > 0 
       ? `<div class="account-payment-methods">
@@ -122,14 +132,14 @@ function renderAccounts() {
         </div>` : '<div class="account-payment-methods"><p style="opacity: 0.6; font-size: 12px; margin: 8px 0;">No payment methods available</p></div>';
     
     return `
-    <div class="account-item" style="border-left-color: ${account.colour};">
+    <div class="account-item" style="border-left-color: ${account.colour}; position:relative;">
       <div class="account-header">
-        <i class="${iconClass}" style="color: ${account.colour}; font-size: 24px; margin-right: 10px;"></i>
-        <div>
-          <h4>${account.name}</h4>
-          ${sharedIcon}
-          <span class="account-currency">${account.currency || 'EUR'}</span>
-        </div>
+        <i class="${iconClass}" style="color: ${account.colour}; font-size: 32px;"></i>
+        <div style="position:absolute; top:10px; right:10px;">${sharedIcon}</div>
+      </div>
+      <div style="margin: 10px 0;">
+        <h4 style="margin: 0;">${account.name}</h4>
+        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;">${formatNumber(balance)} ${account.currency || 'EUR'}</div>
       </div>
       ${methodsHtml}
       <div class="item-actions">
@@ -139,6 +149,22 @@ function renderAccounts() {
   `}).join('');
   
   list.innerHTML = items;
+}
+
+function computeAccountBalance(accId){
+  let b=0;
+  const acc=data.accounts.find(a=>a.id===accId);
+  const shared=acc?.sharedBalance;
+  (data.transactions||[]).forEach(t=>{
+    if(t.toGoalId) return;
+    if(t.type==='income'&&t.accountId===accId&&(shared||(t.methodId||'')===t.methodId)) b+=t.amount;
+    if(t.type==='expense'&&t.accountId===accId&&(shared||(t.methodId||'')===t.methodId)) b-=t.amount;
+    if(t.type==='transfer'){
+      if(t.fromAccountId===accId) b-=t.amount;
+      if(t.toAccountId===accId) b+=t.amount;
+    }
+  });
+  return b;
 }
 
 function getAccountIcon(type) {
@@ -223,6 +249,263 @@ window.editAccount = function(id) {
   const account = data.accounts.find(a => a.id === id);
   if (account) showAccountModal(account);
 };
+
+// RECURRING PAYMENTS
+let editingRecurring = null;
+
+function renderRecurringPayments() {
+  const list = document.getElementById('recurring-list');
+  
+  if (!data.recurringPayments || data.recurringPayments.length === 0) {
+    list.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 40px; grid-column: 1 / -1;">No recurring payments yet. Click the + button above to add your first recurring payment.</p>';
+    return;
+  }
+  
+  const items = data.recurringPayments.map(rec => {
+    const isIncome = rec.type === 'income';
+    const icon = isIncome 
+      ? '<i class="fa-solid fa-sack-dollar" style="color: var(--color-positive);"></i>'
+      : '<i class="fa-solid fa-sack-dollar" style="color: var(--color-negative);"></i>';
+    const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
+    const accountName = account ? account.name : 'Unknown';
+    const currency = account?.currency || 'EUR';
+    
+    return `
+    <div class="recurring-item" style="border-left-color: ${account?.colour || '#2E86DE'}; position: relative;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+        ${icon}
+        <h4 style="margin: 0;">${rec.type.charAt(0).toUpperCase() + rec.type.slice(1)}</h4>
+      </div>
+      <div style="font-size: 18px; font-weight: bold; margin: 5px 0;">${formatNumber(rec.amount)} ${currency}</div>
+      <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">${accountName}</div>
+      ${rec.category ? `<div style="font-size: 12px; opacity: 0.7;">Category: ${rec.category}</div>` : ''}
+      ${rec.note ? `<div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">${rec.note}</div>` : ''}
+      <div style="margin-top: 15px; display: flex; gap: 10px;">
+        <button onclick="executeRecurring('${rec.id}')" class="btn-primary" style="font-size: 12px; padding: 5px 10px;">
+          <i class="fa-solid fa-play"></i> Execute
+        </button>
+        <button onclick="editRecurring('${rec.id}')" style="font-size: 12px; padding: 5px 10px;">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button onclick="deleteRecurring('${rec.id}')" style="font-size: 12px; padding: 5px 10px;">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `}).join('');
+  
+  list.innerHTML = items;
+}
+
+function showRecurringModal(rec = null) {
+  editingRecurring = rec;
+  const modal = document.getElementById('recurring-modal');
+  const form = document.getElementById('recurring-form');
+  const title = document.getElementById('recurring-form-title');
+  const deleteBtn = document.getElementById('rec-delete-btn');
+  
+  title.textContent = rec ? 'Edit Recurring Payment' : 'Add Recurring Payment';
+  deleteBtn.style.display = rec ? 'block' : 'none';
+  
+  // Populate account selects
+  const accountOptions = data.accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+  document.getElementById('rec-acc').innerHTML = '<option value="">Select Account</option>' + accountOptions;
+  document.getElementById('rec-from-acc').innerHTML = '<option value="">Select Account</option>' + accountOptions;
+  document.getElementById('rec-to-acc').innerHTML = '<option value="">Select Account</option>' + accountOptions;
+  
+  // Populate categories
+  const allCats = [...data.categories.income, ...data.categories.expense];
+  const catOptions = allCats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  document.getElementById('rec-cat').innerHTML = '<option value="">Select Category</option>' + catOptions;
+  
+  if (rec) {
+    document.getElementById('rec-type').value = rec.type;
+    document.getElementById('rec-amount').value = rec.amount;
+    document.getElementById('rec-source').value = rec.source || '';
+    document.getElementById('rec-note').value = rec.note || '';
+    document.getElementById('rec-cat').value = rec.category || '';
+    
+    if (rec.type !== 'transfer') {
+      document.getElementById('rec-acc').value = rec.accountId || '';
+      fillRecMethods();
+      document.getElementById('rec-method').value = rec.methodId || 'none';
+    } else {
+      document.getElementById('rec-from-acc').value = rec.fromAccountId || '';
+      document.getElementById('rec-to-acc').value = rec.toAccountId || '';
+      fillRecFromMethods();
+      fillRecToMethods();
+      document.getElementById('rec-from-method').value = rec.fromMethodId || 'none';
+      document.getElementById('rec-to-method').value = rec.toMethodId || 'none';
+      if (rec.toGoalId) {
+        document.getElementById('rec-to-goal').checked = true;
+        fillRecGoals();
+        document.getElementById('rec-goal-select').value = rec.toGoalId;
+      }
+    }
+  } else {
+    form.reset();
+  }
+  
+  updateRecurringUI();
+  modal.classList.remove('hidden');
+}
+
+function hideRecurringModal() {
+  document.getElementById('recurring-modal').classList.add('hidden');
+  editingRecurring = null;
+}
+
+function updateRecurringUI() {
+  const type = document.getElementById('rec-type').value;
+  document.getElementById('rec-income-fields').style.display = type === 'income' ? 'block' : 'none';
+  document.getElementById('rec-single-fields').classList.toggle('hidden', type === 'transfer');
+  document.getElementById('rec-transfer-fields').classList.toggle('hidden', type !== 'transfer');
+  
+  const catSel = document.getElementById('rec-cat');
+  catSel.style.display = type === 'transfer' ? 'none' : 'block';
+  if (catSel.previousElementSibling) catSel.previousElementSibling.style.display = type === 'transfer' ? 'none' : 'block';
+  
+  if (type === 'transfer') {
+    const toGoal = document.getElementById('rec-to-goal').checked;
+    document.getElementById('rec-goal-dest').classList.toggle('hidden', !toGoal);
+    if (toGoal) fillRecGoals();
+  }
+}
+
+function fillRecMethods() {
+  const accId = document.getElementById('rec-acc').value;
+  const methods = data.paymentMethods.filter(m => m.accountId === accId);
+  const html = '<option value="none">None</option>' + methods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('rec-method').innerHTML = html;
+}
+
+function fillRecFromMethods() {
+  const accId = document.getElementById('rec-from-acc').value;
+  const methods = data.paymentMethods.filter(m => m.accountId === accId);
+  const html = '<option value="none">None</option>' + methods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('rec-from-method').innerHTML = html;
+}
+
+function fillRecToMethods() {
+  const accId = document.getElementById('rec-to-acc').value;
+  const methods = data.paymentMethods.filter(m => m.accountId === accId);
+  const html = '<option value="none">None</option>' + methods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  document.getElementById('rec-to-method').innerHTML = html;
+}
+
+function fillRecGoals() {
+  const toAcc = document.getElementById('rec-to-acc').value;
+  const goals = data.goals.filter(g => g.accountId === toAcc);
+  const html = '<option value="">Select Goal</option>' + goals.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+  document.getElementById('rec-goal-select').innerHTML = html;
+}
+
+function saveRecurring(e) {
+  e.preventDefault();
+  
+  const type = document.getElementById('rec-type').value;
+  const recurring = {
+    id: editingRecurring?.id || generateId(),
+    type: type,
+    amount: parseAmountEU(document.getElementById('rec-amount').value),
+    category: document.getElementById('rec-cat').value,
+    note: document.getElementById('rec-note').value
+  };
+  
+  if (type === 'income') {
+    recurring.source = document.getElementById('rec-source').value;
+    recurring.accountId = document.getElementById('rec-acc').value;
+    const methodVal = document.getElementById('rec-method').value;
+    recurring.methodId = methodVal === 'none' ? '' : methodVal;
+  } else if (type === 'expense') {
+    recurring.accountId = document.getElementById('rec-acc').value;
+    const methodVal = document.getElementById('rec-method').value;
+    recurring.methodId = methodVal === 'none' ? '' : methodVal;
+  } else if (type === 'transfer') {
+    recurring.fromAccountId = document.getElementById('rec-from-acc').value;
+    recurring.toAccountId = document.getElementById('rec-to-acc').value;
+    const fromMethodVal = document.getElementById('rec-from-method').value;
+    const toMethodVal = document.getElementById('rec-to-method').value;
+    recurring.fromMethodId = fromMethodVal === 'none' ? '' : fromMethodVal;
+    recurring.toMethodId = toMethodVal === 'none' ? '' : toMethodVal;
+    
+    if (document.getElementById('rec-to-goal').checked) {
+      recurring.toGoalId = document.getElementById('rec-goal-select').value;
+    }
+  }
+  
+  if (editingRecurring) {
+    const index = data.recurringPayments.findIndex(r => r.id === editingRecurring.id);
+    data.recurringPayments[index] = recurring;
+  } else {
+    data.recurringPayments.push(recurring);
+  }
+  
+  saveData();
+  renderRecurringPayments();
+  hideRecurringModal();
+}
+
+function executeRecurring(id) {
+  const rec = data.recurringPayments.find(r => r.id === id);
+  if (!rec) return;
+  
+  // Create a transaction with current date
+  const transaction = {
+    id: generateId(),
+    type: rec.type,
+    amount: rec.amount,
+    date: new Date().toISOString().split('T')[0],
+    note: rec.note || '',
+    category: rec.category || ''
+  };
+  
+  if (rec.type === 'income') {
+    transaction.source = rec.source || '';
+    transaction.accountId = rec.accountId;
+    transaction.methodId = rec.methodId || '';
+  } else if (rec.type === 'expense') {
+    transaction.accountId = rec.accountId;
+    transaction.methodId = rec.methodId || '';
+  } else if (rec.type === 'transfer') {
+    transaction.fromAccountId = rec.fromAccountId;
+    transaction.toAccountId = rec.toAccountId;
+    transaction.fromMethodId = rec.fromMethodId || '';
+    transaction.toMethodId = rec.toMethodId || '';
+    if (rec.toGoalId) {
+      transaction.toGoalId = rec.toGoalId;
+      // Update goal current amount
+      const goal = data.goals.find(g => g.id === rec.toGoalId);
+      if (goal) {
+        goal.current = (goal.current || 0) + rec.amount;
+      }
+    }
+  }
+  
+  data.transactions.push(transaction);
+  saveData();
+  alert(`Transaction executed successfully! Date: ${transaction.date}`);
+  renderRecurringPayments();
+}
+
+function deleteRecurring(id) {
+  const rec = data.recurringPayments.find(r => r.id === id);
+  if (!rec) return;
+  
+  showConfirmModal(`Delete recurring payment?`, () => {
+    data.recurringPayments = data.recurringPayments.filter(r => r.id !== id);
+    saveData();
+    renderRecurringPayments();
+  });
+}
+
+window.editRecurring = function(id) {
+  const rec = data.recurringPayments.find(r => r.id === id);
+  if (rec) showRecurringModal(rec);
+};
+
+window.executeRecurring = executeRecurring;
+window.deleteRecurring = deleteRecurring;
 
 // GOALS
 let editingGoal = null;
@@ -692,6 +975,24 @@ document.getElementById('cancel-payment-method-btn')?.addEventListener('click', 
 document.getElementById('payment-method-form')?.addEventListener('submit', savePaymentMethod);
 document.getElementById('delete-payment-method-btn')?.addEventListener('click', deletePaymentMethod);
 
+// Recurring payment event listeners
+document.getElementById('rec-type')?.addEventListener('change', updateRecurringUI);
+document.getElementById('rec-acc')?.addEventListener('change', fillRecMethods);
+document.getElementById('rec-from-acc')?.addEventListener('change', fillRecFromMethods);
+document.getElementById('rec-to-acc')?.addEventListener('change', () => {
+  fillRecToMethods();
+  if (document.getElementById('rec-to-goal').checked) fillRecGoals();
+});
+document.getElementById('rec-to-goal')?.addEventListener('change', updateRecurringUI);
+document.getElementById('recurring-form')?.addEventListener('submit', saveRecurring);
+document.getElementById('rec-cancel-btn')?.addEventListener('click', hideRecurringModal);
+document.getElementById('rec-delete-btn')?.addEventListener('click', () => {
+  if (editingRecurring) {
+    deleteRecurring(editingRecurring.id);
+    hideRecurringModal();
+  }
+});
+
 // Filter payment method types when account changes
 document.getElementById('payment-method-account')?.addEventListener('change', (e) => {
   filterPaymentMethodTypes(e.target.value);
@@ -736,6 +1037,7 @@ window.showAccountModal = showAccountModal;
 window.showGoalModal = showGoalModal;
 window.showCategoryModal = showCategoryModal;
 window.showPaymentMethodModal = showPaymentMethodModal;
+window.showRecurringModal = showRecurringModal;
 window.showConfirmModal = showConfirmModal;
 window.hideConfirmModal = hideConfirmModal;
 window.confirmDelete = confirmDelete;

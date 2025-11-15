@@ -81,7 +81,6 @@ const fillCats=()=>{
 };
 const updateUI=()=>{
   const type=document.getElementById('type').value;
-  const rec=document.getElementById('recurring').value;
   document.getElementById('income-fields').classList.toggle('hidden',type!=='income');
   document.getElementById('single-fields').classList.toggle('hidden',type==='transfer');
   document.getElementById('transfer-fields').classList.toggle('hidden',type!=='transfer');
@@ -116,10 +115,6 @@ const updateUI=()=>{
     goalWrap && goalWrap.classList.add('hidden');
     toMethod && toMethod.removeAttribute('disabled');
   }
-  document.getElementById('recurring-fields').classList.toggle('hidden',rec==='none');
-  document.getElementById('weekly').classList.toggle('hidden',rec!=='weekly');
-  document.getElementById('monthly').classList.toggle('hidden',rec!=='monthly');
-  document.getElementById('yearly').classList.toggle('hidden',rec!=='yearly');
   fillCats();
 };
 
@@ -261,9 +256,6 @@ const saveTxn=e=>{
   const type=document.getElementById('type').value;
   const amount=parseEU(document.getElementById('amount').value);
   const date=document.getElementById('date').value;
-  const rec=document.getElementById('recurring').value;
-  const start=document.getElementById('start').value||date;
-  const today=new Date().toISOString().split('T')[0];
   if(type==='transfer'){
     const fromAcc=document.getElementById('from-acc').value;
     const toAcc=document.getElementById('to-acc').value;
@@ -285,60 +277,51 @@ const saveTxn=e=>{
       }
     }
   }
-  let dates=rec==='none'?[date]:genDates(start,today,rec,
-    document.getElementById('weekday').value,
-    document.getElementById('day').value||1,
-    document.getElementById('month').value||1,
-    document.getElementById('yday').value||1
-  );
-
   const txns=[]; let error=false;
-  dates.forEach(d=>{
-    if(error) return;
-    if(type==='expense'){
-      const acc=document.getElementById('acc').value;
-      const met=document.getElementById('method').value||'';
-      const avail=balance(acc,met);
-      if(avail<amount){
-        showMessage(`Insufficient funds: ${f(avail)} available in ${label(acc,met)}; need ${f(amount)}.`);
-        error=true; return;
-      }
+  if(error) return;
+  if(type==='expense'){
+    const acc=document.getElementById('acc').value;
+    const met=document.getElementById('method').value||'';
+    const avail=balance(acc,met);
+    if(avail<amount){
+      showMessage(`Insufficient funds: ${f(avail)} available in ${label(acc,met)}; need ${f(amount)}.`);
+      error=true; return;
     }
-    if(type==='transfer'){
-      const from=document.getElementById('from-acc').value;
-      const fromMet=document.getElementById('from-method').value||'';
-      const avail=balance(from,fromMet);
-      if(avail<amount){
-        showMessage(`Transfer blocked: ${f(avail)} ${accountCurrency(from)} available in ${label(from,fromMet)}; need ${f(amount)} ${accountCurrency(from)}.`);
-        error=true; return;
-      }
+  }
+  if(type==='transfer'){
+    const from=document.getElementById('from-acc').value;
+    const fromMet=document.getElementById('from-method').value||'';
+    const avail=balance(from,fromMet);
+    if(avail<amount){
+      showMessage(`Transfer blocked: ${f(avail)} ${accountCurrency(from)} available in ${label(from,fromMet)}; need ${f(amount)} ${accountCurrency(from)}.`);
+      error=true; return;
     }
-    const base={
-      id:id(),type,amount,date:d,
-      note:document.getElementById('note').value,
-      category:type==='transfer'?'':document.getElementById('cat').value
-    };
-    if(type==='income'){
-      base.accountId=document.getElementById('acc').value;
-      { const v=document.getElementById('method').value; base.methodId=(v==='none')?'':v; }
-      base.source=document.getElementById('source').value;
+  }
+  const base={
+    id:id(),type,amount,date,
+    note:document.getElementById('note').value,
+    category:type==='transfer'?'':document.getElementById('cat').value
+  };
+  if(type==='income'){
+    base.accountId=document.getElementById('acc').value;
+    { const v=document.getElementById('method').value; base.methodId=(v==='none')?'':v; }
+    base.source=document.getElementById('source').value;
+  }
+  if(type==='expense'){
+    base.accountId=document.getElementById('acc').value;
+    { const v=document.getElementById('method').value; base.methodId=(v==='none')?'':v; }
+  }
+  if(type==='transfer'){
+    base.fromAccountId=document.getElementById('from-acc').value;
+    { const v=document.getElementById('from-method').value; base.fromMethodId=(v==='none')?'':v; }
+    base.toAccountId=document.getElementById('to-acc').value;
+    { const v=document.getElementById('to-method').value; base.toMethodId=(v==='none')?'':v; }
+    const toGoal = document.getElementById('to-goal').checked;
+    if (toGoal) {
+      base.toGoalId = document.getElementById('goal-select').value;
     }
-    if(type==='expense'){
-      base.accountId=document.getElementById('acc').value;
-      { const v=document.getElementById('method').value; base.methodId=(v==='none')?'':v; }
-    }
-    if(type==='transfer'){
-      base.fromAccountId=document.getElementById('from-acc').value;
-      { const v=document.getElementById('from-method').value; base.fromMethodId=(v==='none')?'':v; }
-      base.toAccountId=document.getElementById('to-acc').value;
-      { const v=document.getElementById('to-method').value; base.toMethodId=(v==='none')?'':v; }
-      const toGoal = document.getElementById('to-goal').checked;
-      if (toGoal) {
-        base.toGoalId = document.getElementById('goal-select').value;
-      }
-    }
-    txns.push(base);
-  });
+  }
+  txns.push(base);
 
   if(error) return;
   if(edit)store.transactions=store.transactions.filter(t=>t.id!==edit.id);
@@ -350,64 +333,15 @@ const saveTxn=e=>{
       if (g){ g.current = (g.current||0) + t.amount; }
     }
   });
-  // Persist recurring rule for future auto-application
-  if (rec!=='none'){
-    const lastGen = dates[dates.length-1];
-    const rule = buildRecurringRuleFromForm(lastGen);
-    upsertRecurringRule(rule);
-  }
   save();render();closeModal();
 };
 
-function buildRecurringRuleFromForm(lastApplied){
-  const type=document.getElementById('type').value;
-  const base={
-    id: id(),
-    type,
-    amount: parseEU(document.getElementById('amount').value),
-    category: type==='transfer' ? '' : document.getElementById('cat').value,
-    note: document.getElementById('note').value||'',
-    frequency: document.getElementById('recurring').value,
-    startDate: document.getElementById('start').value || document.getElementById('date').value,
-    weekday: document.getElementById('weekday').value,
-    day: document.getElementById('day').value,
-    month: document.getElementById('month').value,
-    yday: document.getElementById('yday').value,
-    lastApplied
-  };
-  if (type==='income' || type==='expense'){
-    base.accountId=document.getElementById('acc').value; base.methodId=document.getElementById('method').value||''; if (type==='income') base.source=document.getElementById('source').value||'';
-  } else if (type==='transfer'){
-    base.fromAccountId=document.getElementById('from-acc').value; base.fromMethodId=document.getElementById('from-method').value||'';
-    base.toAccountId=document.getElementById('to-acc').value; base.toMethodId=document.getElementById('to-method').value||'';
-    if (document.getElementById('to-goal').checked){ base.toGoalId = document.getElementById('goal-select').value; }
-  }
-  return base;
-}
 
-function upsertRecurringRule(rule){
-  // Simple de-duplication by signature
-  const sig = JSON.stringify({
-    t:rule.type,a:rule.accountId,fa:rule.fromAccountId,ta:rule.toAccountId,m:rule.methodId,fm:rule.fromMethodId,tm:rule.toMethodId,tg:rule.toGoalId||'',c:rule.category,amt:rule.amount,f:rule.frequency,d:rule.day,wd:rule.weekday,mo:rule.month,yd:rule.yday
-  });
-  let found = -1;
-  for (let i=0;i<store.recurringRules.length;i++){
-    const r=store.recurringRules[i];
-    const rSig = JSON.stringify({t:r.type,a:r.accountId,fa:r.fromAccountId,ta:r.toAccountId,m:r.methodId,fm:r.fromMethodId,tm:r.toMethodId,tg:r.toGoalId||'',c:r.category,amt:r.amount,f:r.frequency,d:r.day,wd:r.weekday,mo:r.month,yd:r.yday});
-    if (rSig===sig){ found=i; break; }
-  }
-  if (found>=0){
-    // Update lastApplied and startDate (keep earliest)
-    store.recurringRules[found].lastApplied = rule.lastApplied;
-    if (new Date(rule.startDate) < new Date(store.recurringRules[found].startDate)) store.recurringRules[found].startDate = rule.startDate;
-  } else {
-    store.recurringRules.push(rule);
-  }
-}
+let activeTypeFilter = '';
 
 const render=()=>{
   const q=document.getElementById('search').value.toLowerCase();
-  const t=document.getElementById('filter-type').value;
+  const t=activeTypeFilter || '';
   const c=document.getElementById('filter-cat').value;
   let list=store.transactions.filter(x=>{
     const dateStr=d(x.date).toLowerCase();
@@ -514,7 +448,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('cancel').onclick=closeModal;
   document.getElementById('form').onsubmit=saveTxn;
   document.getElementById('type').onchange=updateUI;
-  document.getElementById('recurring').onchange=updateUI;
   ['acc','from-acc','to-acc'].forEach(id=>document.getElementById(id).onchange=()=>fillMethods(id,id.replace('acc','method')));
   // Populate goals when destination account changes
   document.getElementById('to-acc').addEventListener('change', ()=>{
@@ -532,9 +465,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   const cats=[...store.categories.income,...store.categories.expense].map(c=>c.name);
   document.getElementById('filter-cat').innerHTML='<option value="">All Categories</option>'+cats.map(n=>`<option>${e(n)}</option>`).join('');
 
+  // Tab navigation for type filter
+  let activeTypeFilter = '';
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTypeFilter = btn.dataset.type || '';
+      render();
+    });
+  });
+
   // Filters and search should re-render the table on change/input
   document.getElementById('search').addEventListener('input', render);
-  document.getElementById('filter-type').addEventListener('change', render);
   document.getElementById('filter-cat').addEventListener('change', render);
 
   const t=document.getElementById('theme-toggle');

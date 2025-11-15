@@ -96,7 +96,7 @@ h2 {
 .section-description {
   font-size: 13px;
   opacity: 0.6;
-  line-height: 4.4;
+  line-height: 4.5;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -226,7 +226,7 @@ footer {
 /* How it Works badge & list */
 .how-badge {
   display:inline-block;
-  background:linear-gradient(135deg,#0d6efd,#3fa9f5);
+  background:#003580;
   color:#fff;
   font-weight:600;
   padding:6px 18px;
@@ -267,7 +267,7 @@ footer {
 #how-modal .bullet-list li:before { content:''; position:absolute; left:6px; top:8px; width:8px; height:8px; background:#3fa9f5; border-radius:50%; }
 #how-modal .check-list li:before { content:'\2713'; position:absolute; left:4px; top:2px; font-size:14px; color:#0d6efd; }
 #how-modal .how-footer { text-align:right; margin-top:24px; }
-#how-modal .how-footer button.primary { background:#0d6efd; border:none; padding:10px 24px; font-weight:600; border-radius:10px; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.2); }
+#how-modal .how-footer button.primary { background:#003580; border:none; padding:10px 24px; font-weight:600; border-radius:10px; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,.2); }
 #how-modal .how-footer button.primary:hover { filter:brightness(1.05); }
 
 /* Responsive settings page */

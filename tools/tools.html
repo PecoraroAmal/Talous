@@ -8,23 +8,23 @@
   <link rel="icon" type="image/svg+xml" href="/Talous/icons/favicon.svg" />
   <link rel="shortcut icon" href="/Talous/icons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Talous/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="/Talous/manifest.json?v=4.4" />
+  <link rel="manifest" href="/Talous/manifest.json?v=4.5" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
-  <link rel="stylesheet" href="/Talous/style.css?v=4.4">
-  <link rel="stylesheet" href="/Talous/tools/tools.css?v=4.4">
+  <link rel="stylesheet" href="/Talous/style.css?v=4.5">
+  <link rel="stylesheet" href="/Talous/tools/tools.css?v=4.5">
   <script>
-      if (window.location.pathname + window.location.search !== '/Talous/tools/tools.html?v=4.4') {
-          window.location.replace('/Talous/tools/tools.html?v=4.4');
+      if (window.location.pathname + window.location.search !== '/Talous/tools/tools.html?v=4.5') {
+          window.location.replace('/Talous/tools/tools.html?v=4.5');
       }
   </script>
 </head>
 <body>
   <nav class="app-nav">
-    <a href="/Talous/index.html?v=4.4" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
-    <a href="/Talous/transactions/transactions.html?v=4.4" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
-    <a href="/Talous/charts/charts.html?v=4.4" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
-    <a href="/Talous/tools/tools.html?v=4.4" class="active" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
-    <a href="/Talous/settings/settings.html?v=4.4" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+    <a href="/Talous/index.html?v=4.5" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/Talous/transactions/transactions.html?v=4.5" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/Talous/charts/charts.html?v=4.5" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/Talous/tools/tools.html?v=4.5" class="active" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/Talous/settings/settings.html?v=4.5" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
   </nav>
   <div class="container">
     <header>
@@ -41,6 +41,18 @@
           </div>
         </div>
         <div id="accounts-list" class="items-grid">
+        </div>
+      </section>
+
+      <!-- Recurring Payments Section -->
+      <section class="tool-section">
+        <h2><i class="fa-solid fa-sack-dollar"></i> Recurring Payments</h2>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+          <div class="add-card" onclick="showRecurringModal()" style="max-width: 300px; width: 100%;">
+            <i class="fa-solid fa-plus"></i>
+          </div>
+        </div>
+        <div id="recurring-list" class="items-grid">
         </div>
       </section>
 
@@ -75,6 +87,61 @@
       </section>
 
     </main>
+
+    <!-- Recurring Payment Modal -->
+    <div id="recurring-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h2 id="recurring-form-title">Add Recurring Payment</h2>
+        <form id="recurring-form">
+          <label>Type</label>
+          <select id="rec-type" required>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+            <option value="transfer">Transfer</option>
+          </select>
+
+          <label>Amount</label>
+          <input type="number" id="rec-amount" step="0.01" required>
+
+          <div id="rec-income-fields">
+            <label>From (source)</label>
+            <input type="text" id="rec-source">
+          </div>
+
+          <div id="rec-single-fields">
+            <label>Account</label><select id="rec-acc" required></select>
+            <label>Method</label><select id="rec-method" required><option value="none">None</option></select>
+          </div>
+
+          <div id="rec-transfer-fields" class="hidden">
+            <label>From Account</label><select id="rec-from-acc" required></select>
+            <label>From Method</label><select id="rec-from-method" required><option value="none">None</option></select>
+            <label>To Account</label><select id="rec-to-acc" required></select>
+            <label>To Method</label><select id="rec-to-method" required><option value="none">None</option></select>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+              <input type="checkbox" id="rec-to-goal" />
+              <label for="rec-to-goal" style="margin:0;">Transfer to Goal</label>
+            </div>
+            <div id="rec-goal-dest" class="hidden">
+              <label>Goal</label>
+              <select id="rec-goal-select"><option value="">Select Goal</option></select>
+            </div>
+          </div>
+
+          <label>Category</label>
+          <select id="rec-cat" required></select>
+
+          <label>Note</label>
+          <textarea id="rec-note" rows="2"></textarea>
+
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button type="submit" class="btn-primary">Save</button>
+            <button type="button" id="rec-cancel-btn">Cancel</button>
+            <button type="button" id="rec-delete-btn" class="delete-btn" style="display: none; margin-left: auto;">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Account Modal -->
     <div id="account-modal" class="modal-overlay hidden">
@@ -223,6 +290,6 @@
     </div>
   </div>
 
-  <script type="module" src="/Talous/tools/tools.js?v=4.4"></script>
+  <script type="module" src="/Talous/tools/tools.js?v=4.5"></script>
 </body>
 </html>
