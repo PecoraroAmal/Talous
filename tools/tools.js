@@ -349,20 +349,57 @@ function hideRecurringModal() {
   editingRecurring = null;
 }
 
+// Helper to toggle required only on visible controls to avoid
+// browser validation error: "An invalid form control with name='' is not focusable.".
+function setRequired(id,on){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(on) el.setAttribute('required','required'); else el.removeAttribute('required');
+}
+
 function updateRecurringUI() {
   const type = document.getElementById('rec-type').value;
-  document.getElementById('rec-income-fields').style.display = type === 'income' ? 'block' : 'none';
-  document.getElementById('rec-single-fields').classList.toggle('hidden', type === 'transfer');
-  document.getElementById('rec-transfer-fields').classList.toggle('hidden', type !== 'transfer');
-  
+  const incomeFields = document.getElementById('rec-income-fields');
+  const singleFields = document.getElementById('rec-single-fields');
+  const transferFields = document.getElementById('rec-transfer-fields');
+  incomeFields.style.display = type === 'income' ? 'block' : 'none';
+  singleFields.classList.toggle('hidden', type === 'transfer');
+  transferFields.classList.toggle('hidden', type !== 'transfer');
+
   const catSel = document.getElementById('rec-cat');
   catSel.style.display = type === 'transfer' ? 'none' : 'block';
   if (catSel.previousElementSibling) catSel.previousElementSibling.style.display = type === 'transfer' ? 'none' : 'block';
-  
+
   if (type === 'transfer') {
+    // Remove required from single account fields
+    setRequired('rec-acc', false);
+    setRequired('rec-method', false);
+    // Add required to transfer fields
+    setRequired('rec-from-acc', true);
+    setRequired('rec-from-method', true);
+    setRequired('rec-to-acc', true);
+    setRequired('rec-to-method', true);
+    // Category not required for transfer
+    setRequired('rec-cat', false);
     const toGoal = document.getElementById('rec-to-goal').checked;
-    document.getElementById('rec-goal-dest').classList.toggle('hidden', !toGoal);
-    if (toGoal) fillRecGoals();
+    const goalDest = document.getElementById('rec-goal-dest');
+    goalDest.classList.toggle('hidden', !toGoal);
+    if (toGoal) {
+      fillRecGoals();
+      setRequired('rec-goal-select', true);
+    } else {
+      setRequired('rec-goal-select', false);
+    }
+  } else {
+    // Income / Expense
+    setRequired('rec-acc', true);
+    setRequired('rec-method', true);
+    setRequired('rec-from-acc', false);
+    setRequired('rec-from-method', false);
+    setRequired('rec-to-acc', false);
+    setRequired('rec-to-method', false);
+    setRequired('rec-goal-select', false);
+    setRequired('rec-cat', true);
   }
 }
 
@@ -943,7 +980,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.76 safely
+// Parse amounts written as 1.234,56 or 1234.86 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
