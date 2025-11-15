@@ -171,7 +171,17 @@ function computeHoldings() {
 // Create pie chart
 function createPieChart(canvasId, data, title) {
   const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn(`[Charts] Canvas ${canvasId} not found`);
+    return;
+  }
+  
+  if (typeof Chart === 'undefined') {
+    console.error('[Charts] Chart.js library not loaded');
+    ctx.getContext('2d').fillText('Chart library not loaded', 10, 50);
+    return;
+  }
+  
   // Fallback for empty data: show a placeholder slice
   let labels = Object.keys(data);
   let values = Object.values(data);
@@ -221,7 +231,15 @@ function createPieChart(canvasId, data, title) {
 // Create line chart for trend
 function createTrendChart() {
   const ctx = document.getElementById('trend-chart');
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn('[Charts] Canvas trend-chart not found');
+    return;
+  }
+  
+  if (typeof Chart === 'undefined') {
+    console.error('[Charts] Chart.js library not loaded for trend');
+    return;
+  }
   
   // Sort transactions by date
   const sorted = [...data.transactions].filter(t=>t.date).sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -344,4 +362,5 @@ if (themeToggle) {
 
 // Initialise
 console.log('[Charts] Initialising charts page');
+console.log('[Charts] Chart.js loaded:', typeof Chart !== 'undefined');
 loadData();

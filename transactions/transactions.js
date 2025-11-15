@@ -52,7 +52,7 @@ const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quo
 const f=n=>new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 const d=s=>new Date(s).toLocaleDateString('it-IT');
 
-// Parse amounts written as 1.234,56 or 1234.116 safely
+// Parse amounts written as 1.234,56 or 1234.126 safely
 const parseEU=(val)=>{
   if(typeof val==='number') return val;
   let s=(val||'').toString().trim();
