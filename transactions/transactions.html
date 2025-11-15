@@ -8,23 +8,23 @@
   <link rel="icon" type="image/svg+xml" href="/Talous/icons/favicon.svg" />
   <link rel="shortcut icon" href="/Talous/icons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/Talous/icons/apple-touch-icon.png" />
-  <link rel="manifest" href="/Talous/manifest.json?v=4.8" />
+  <link rel="manifest" href="/Talous/manifest.json?v=4.9" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/Talous/style.css?v=4.8">
-  <link rel="stylesheet" href="/Talous/transactions/transactions.css?v=4.8">
+  <link rel="stylesheet" href="/Talous/style.css?v=4.9">
+  <link rel="stylesheet" href="/Talous/transactions/transactions.css?v=4.9">
   <script>
-      if (window.location.pathname + window.location.search !== '/Talous/transactions/transactions.html?v=4.8') {
-          window.location.replace('/Talous/transactions/transactions.html?v=4.8');
+      if (window.location.pathname + window.location.search !== '/Talous/transactions/transactions.html?v=4.9') {
+          window.location.replace('/Talous/transactions/transactions.html?v=4.9');
       }
   </script>
 </head>
 <body>
   <nav class="app-nav">
-    <a href="/Talous/index.html?v=4.8" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
-    <a href="/Talous/transactions/transactions.html?v=4.8" class="active" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
-    <a href="/Talous/charts/charts.html?v=4.8" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
-    <a href="/Talous/tools/tools.html?v=4.8" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
-    <a href="/Talous/settings/settings.html?v=4.8" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
+    <a href="/Talous/index.html?v=4.9" title="Dashboard" aria-label="Dashboard"><i class="fa-solid fa-house"></i></a>
+    <a href="/Talous/transactions/transactions.html?v=4.9" class="active" title="Transactions" aria-label="Transactions"><i class="fa-solid fa-money-bill-transfer"></i></a>
+    <a href="/Talous/charts/charts.html?v=4.9" title="Charts" aria-label="Charts"><i class="fa-solid fa-chart-pie"></i></a>
+    <a href="/Talous/tools/tools.html?v=4.9" title="Tools" aria-label="Tools"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+    <a href="/Talous/settings/settings.html?v=4.9" title="Settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></a>
   </nav>
 
   <div class="container">
@@ -82,15 +82,6 @@
             <label>From Method</label><select id="from-method" required><option value="none">None</option></select>
             <label>To Account</label><select id="to-acc" required></select>
             <label>To Method</label><select id="to-method" required><option value="none">None</option></select>
-            <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
-              <input type="checkbox" id="to-goal" />
-              <label for="to-goal" style="margin:0;">Destination is a Goal (Deposit)</label>
-            </div>
-            <div id="goal-dest" class="hidden">
-              <label>Goal</label>
-              <select id="goal-select"><option value="">Select Goal</option></select>
-              <div id="deposit-note" style="opacity:0.8; font-size:12px; margin-top:6px;">Method set to Deposit and cannot be changed.</div>
-            </div>
           </div>
 
           <label>Category</label>
@@ -134,6 +125,6 @@
 
   <div id="message" class="message hidden"></div>
 
-  <script type="module" src="/Talous/transactions/transactions.js?v=4.8"></script>
+  <script type="module" src="/Talous/transactions/transactions.js?v=4.9"></script>
 </body>
 </html>

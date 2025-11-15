@@ -89,20 +89,14 @@ function renderAll() {
   renderRecurringPayments();
   renderGoals();
   renderCategories();
-  // Payment methods rendering removed
 }
-
-// ACCOUNTS (Banks, Wallets, Crypto, Piggy)
-let editingAccount = null;
 
 function renderAccounts() {
   const list = document.getElementById('accounts-list');
-  
   if (!data.accounts || data.accounts.length === 0) {
     list.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 40px; grid-column: 1 / -1;">No accounts yet. Click the + button above to add your first account.</p>';
     return;
   }
-  
   const items = data.accounts.map(account => {
     const iconClass = getAccountIcon(account.type);
     const associatedMethods = data.paymentMethods.filter(method => method.accountId === account.id);
@@ -111,26 +105,15 @@ function renderAccounts() {
     const sharedIcon = account.sharedBalance
       ? '<i class="fa-solid fa-arrows-rotate" style="color:var(--color-positive);" title="Shared"></i>'
       : '<i class="fa-solid fa-ban" style="color:var(--color-negative);" title="Not Shared"></i>';
-    
     const methodsHtml = associatedMethods.length > 0 
-      ? `<div class="account-payment-methods">
-          ${associatedMethods.map(method => {
-            const methodIcon = getPaymentMethodIcon(method.type);
-            return `<div class="payment-method-mini" onclick="editPaymentMethod('${method.id}')">
-              <i class="${methodIcon}" style="color: ${method.colour};"></i>
-              <span>${method.name}</span>
-            </div>`;
-          }).join('')}
-          ${allowedTypes.length > 0 ? `<div class="add-payment-method" onclick="showPaymentMethodModal(null, '${account.id}')">
-            <i class="fa-solid fa-plus"></i>
-          </div>` : ''}
+      ? `<div class="account-payment-methods">${associatedMethods.map(method => {
+          const methodIcon = getPaymentMethodIcon(method.type);
+          return `<div class=\"payment-method-mini\" onclick=\"editPaymentMethod('${method.id}')\">\n              <i class=\"${methodIcon}\" style=\"color: ${method.colour};\"></i>\n              <span>${method.name}</span>\n            </div>`;
+        }).join('')}
+          ${allowedTypes.length > 0 ? `<div class=\"add-payment-method\" onclick=\"showPaymentMethodModal(null, '${account.id}')\"><i class=\"fa-solid fa-plus\"></i></div>` : ''}
         </div>`
-      : allowedTypes.length > 0 ? `<div class="account-payment-methods">
-          <div class="add-payment-method" onclick="showPaymentMethodModal(null, '${account.id}')">
-            <i class="fa-solid fa-plus"></i>
-          </div>
-        </div>` : '<div class="account-payment-methods"><p style="opacity: 0.6; font-size: 12px; margin: 8px 0;">No payment methods available</p></div>';
-    
+      : allowedTypes.length > 0 ? `<div class="account-payment-methods"><div class="add-payment-method" onclick="showPaymentMethodModal(null, '${account.id}')"><i class="fa-solid fa-plus"></i></div></div>`
+      : '<div class="account-payment-methods"><p style="opacity: 0.6; font-size: 12px; margin: 8px 0;">No payment methods available</p></div>';
     return `
     <div class="account-item" style="border-left-color: ${account.colour}; position:relative;">
       <div class="account-header">
@@ -145,9 +128,8 @@ function renderAccounts() {
       <div class="item-actions">
         <button onclick="editAccount('${account.id}')"><i class="fa-solid fa-pen"></i></button>
       </div>
-    </div>
-  `}).join('');
-  
+    </div>`;
+  }).join('');
   list.innerHTML = items;
 }
 
@@ -263,13 +245,14 @@ function renderRecurringPayments() {
   
   const items = data.recurringPayments.map(rec => {
     const isIncome = rec.type === 'income';
-    const iconColor = isIncome ? 'var(--color-positive)' : 'var(--color-negative)';
+    const iconColor = isIncome ? 'var(--color-positive)' : (rec.type==='expense' ? 'var(--color-negative)' : 'var(--fg-dim)');
+    const cardBg = isIncome ? 'var(--positive-bg, rgba(34,197,94,0.08))' : (rec.type==='expense' ? 'var(--negative-bg, rgba(239,68,68,0.08))' : 'var(--neutral-bg, rgba(107,114,128,0.10))');
     const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
     const typeLabel = rec.type.charAt(0).toUpperCase() + rec.type.slice(1);
     return `
-      <div class="recurring-item" style="border-left-color:${account?.colour || '#2E86DE'};">
+      <div class="recurring-item" style="border-left-color:${account?.colour || '#2E86DE'};background:${cardBg};">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <i class="fa-solid fa-sack-dollar" style="color:${iconColor};font-size:24px;"></i>
@@ -459,10 +442,6 @@ function saveRecurring(e) {
     const toMethodVal = document.getElementById('rec-to-method').value;
     recurring.fromMethodId = fromMethodVal === 'none' ? '' : fromMethodVal;
     recurring.toMethodId = toMethodVal === 'none' ? '' : toMethodVal;
-    
-    if (document.getElementById('rec-to-goal').checked) {
-      recurring.toGoalId = document.getElementById('rec-goal-select').value;
-    }
   }
   
   if (editingRecurring) {
@@ -503,14 +482,6 @@ function executeRecurring(id) {
     transaction.toAccountId = rec.toAccountId;
     transaction.fromMethodId = rec.fromMethodId || '';
     transaction.toMethodId = rec.toMethodId || '';
-    if (rec.toGoalId) {
-      transaction.toGoalId = rec.toGoalId;
-      // Update goal current amount
-      const goal = data.goals.find(g => g.id === rec.toGoalId);
-      if (goal) {
-        goal.current = (goal.current || 0) + rec.amount;
-      }
-    }
   }
   
   data.transactions.push(transaction);
@@ -980,7 +951,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.86 safely
+// Parse amounts written as 1.234,56 or 1234.96 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();

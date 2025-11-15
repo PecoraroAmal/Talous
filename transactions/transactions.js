@@ -52,7 +52,7 @@ const e=s=>s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quo
 const f=n=>new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 const d=s=>new Date(s).toLocaleDateString('it-IT');
 
-// Parse amounts written as 1.234,56 or 1234.86 safely
+// Parse amounts written as 1.234,56 or 1234.96 safely
 const parseEU=(val)=>{
   if(typeof val==='number') return val;
   let s=(val||'').toString().trim();
@@ -262,20 +262,6 @@ const saveTxn=e=>{
     if(!fromAcc||!toAcc){ showMessage('Transfer requires both source and destination.'); return; }
     if(fromAcc===toAcc){ showMessage('Transfer blocked: source and destination cannot be the same.'); return; }
     if(!(amount>0)){ showMessage('Amount must be greater than zero.'); return; }
-    // Goal destination validations
-    const toGoal = document.getElementById('to-goal').checked;
-    if (toGoal) {
-      const goalId = document.getElementById('goal-select').value;
-      if (!goalId) { showMessage('Please select a goal.'); return; }
-      const goal = store.goals.find(g=>g.id===goalId);
-      if (!goal) { showMessage('Invalid goal selected.'); return; }
-      if (goal.accountId !== toAcc) { showMessage('Selected goal must belong to the destination account.'); return; }
-      const availDest = accountBalance(toAcc);
-      if (goal.current + amount > availDest) {
-        showMessage(`Deposit exceeds available balance of destination account (${f(availDest)} ${accountCurrency(toAcc)}).`);
-        return;
-      }
-    }
   }
   const txns=[]; let error=false;
   if(error) return;
@@ -316,23 +302,13 @@ const saveTxn=e=>{
     { const v=document.getElementById('from-method').value; base.fromMethodId=(v==='none')?'':v; }
     base.toAccountId=document.getElementById('to-acc').value;
     { const v=document.getElementById('to-method').value; base.toMethodId=(v==='none')?'':v; }
-    const toGoal = document.getElementById('to-goal').checked;
-    if (toGoal) {
-      base.toGoalId = document.getElementById('goal-select').value;
-    }
   }
   txns.push(base);
 
   if(error) return;
   if(edit)store.transactions=store.transactions.filter(t=>t.id!==edit.id);
   store.transactions.push(...txns);
-  // If any transfer to goal, update goal.current
-  txns.forEach(t=>{
-    if (t.type==='transfer' && t.toGoalId){
-      const g=store.goals.find(x=>x.id===t.toGoalId);
-      if (g){ g.current = (g.current||0) + t.amount; }
-    }
-  });
+  // Removed goal deposit logic
   save();render();closeModal();
 };
 
@@ -417,18 +393,6 @@ const openModal=(txn=null)=>{
       document.getElementById('to-acc').value=txn.toAccountId||'';
       fillMethods('to-acc','to-method');
       document.getElementById('to-method').value=txn.toMethodId||'';
-      // Populate goal controls when editing goal earmark
-      const toGoalEl = document.getElementById('to-goal');
-      if (txn.toGoalId) {
-        toGoalEl.checked = true;
-        updateUI();
-        populateGoalsForAccount();
-        const goalSel = document.getElementById('goal-select');
-        goalSel.value = txn.toGoalId;
-      } else {
-        toGoalEl.checked = false;
-        updateUI();
-      }
     }
   }
   updateUI();
@@ -448,15 +412,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('form').onsubmit=saveTxn;
   document.getElementById('type').onchange=updateUI;
   ['acc','from-acc','to-acc'].forEach(id=>document.getElementById(id).onchange=()=>fillMethods(id,id.replace('acc','method')));
-  // Populate goals when destination account changes
-  document.getElementById('to-acc').addEventListener('change', ()=>{
-    populateGoalsForAccount();
-  });
-  // Toggle goal UI
-  document.getElementById('to-goal').addEventListener('change', ()=>{
-    updateUI();
-    if (document.getElementById('to-goal').checked) populateGoalsForAccount();
-  });
   document.getElementById('confirm-yes').onclick=confirmYes;
   document.getElementById('confirm-no').onclick=hideConfirm;
   document.getElementById('error-close').onclick=hideError;
