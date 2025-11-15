@@ -172,9 +172,13 @@ function computeHoldings() {
 function createPieChart(canvasId, data, title) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return;
-  
-  const labels = Object.keys(data);
-  const values = Object.values(data);
+  // Fallback for empty data: show a placeholder slice
+  let labels = Object.keys(data);
+  let values = Object.values(data);
+  if (!labels.length) {
+    labels = ['No Data'];
+    values = [0];
+  }
   const colours = generateColours(labels.length);
   const chartColours = getChartColours();
   
@@ -220,9 +224,12 @@ function createTrendChart() {
   if (!ctx) return;
   
   // Sort transactions by date
-  const sorted = [...data.transactions].sort((a, b) => 
-    new Date(a.date) - new Date(b.date)
-  );
+  const sorted = [...data.transactions].filter(t=>t.date).sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (!sorted.length) {
+    // Provide a single zero point today
+    const today = new Date().toISOString().split('T')[0];
+    sorted.push({ date: today, type: 'income', amount: 0 });
+  }
   
   // Calculate cumulative balance
   let balance = 0;
@@ -291,6 +298,7 @@ function createTrendChart() {
 
 // Render all charts
 function renderCharts() {
+  console.log('[Charts] Rendering charts. Txns:', data.transactions.length);
   // Income charts
   const incomeByCategory = aggregateByCategory('income');
   const incomeByPayment = aggregateByPaymentType('income');
@@ -335,4 +343,5 @@ if (themeToggle) {
 }
 
 // Initialise
+console.log('[Charts] Initialising charts page');
 loadData();

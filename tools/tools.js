@@ -247,22 +247,26 @@ function renderRecurringPayments() {
     const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
-    const typeLabel = rec.type.charAt(0).toUpperCase() + rec.type.slice(1);
     const iconColor = rec.type === 'income' ? 'var(--color-positive)' : (rec.type === 'expense' ? 'var(--color-negative)' : 'var(--fg-dim)');
-    const borderColor = rec.type === 'income' ? 'var(--color-positive)' : (rec.type === 'expense' ? 'var(--color-negative)' : '#6b7280');
+    const typeColor = iconColor; // use same color for label
+    const typeLabel = rec.type.charAt(0).toUpperCase() + rec.type.slice(1);
     return `
-      <div class="recurring-item" style="border-left-color:${borderColor};">
+      <div class="recurring-item" style="border-left-color:#6b7280;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <i class="fa-solid fa-sack-dollar" style="color:${iconColor};font-size:24px;"></i>
-            <span style="font-weight:600;font-size:14px;">${typeLabel}</span>
+            <i class="fa-solid fa-sack-dollar" style="color:${iconColor};font-size:22px;"></i>
+            <span style="font-weight:600;font-size:14px;color:${typeColor};">${typeLabel}</span>
           </div>
-          <button onclick="executeRecurring('${rec.id}')" class="btn-primary" style="padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px;">
-            <i class="fa-solid fa-play"></i>
-            <span>Execute</span>
-          </button>
+          <div style="display:flex;gap:6px;">
+            <button onclick="executeRecurring('${rec.id}')" class="btn-primary" title="Execute" style="padding:4px 8px;font-size:12px;display:flex;align-items:center;gap:4px;">
+              <i class="fa-solid fa-play"></i>
+            </button>
+            <button onclick="editRecurring('${rec.id}')" title="Edit" style="padding:4px 8px;font-size:12px;">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
         </div>
-        <div style="font-size:18px;font-weight:700;">${formatNumber(rec.amount)} ${currency}</div>
+        <div style="font-size:16px;font-weight:700;">${formatNumber(rec.amount)} ${currency}</div>
         <div style="font-size:12px;opacity:.7;margin-top:4px;">${accountName}</div>
         ${rec.category ? `<div style="font-size:11px;opacity:.65;margin-top:4px;">${rec.category}</div>` : ''}
         ${rec.note ? `<div style="font-size:11px;opacity:.55;margin-top:4px;">${rec.note}</div>` : ''}
@@ -949,7 +953,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.106 safely
+// Parse amounts written as 1.234,56 or 1234.116 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
