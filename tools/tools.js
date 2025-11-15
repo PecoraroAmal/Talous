@@ -263,36 +263,30 @@ function renderRecurringPayments() {
   
   const items = data.recurringPayments.map(rec => {
     const isIncome = rec.type === 'income';
-    const icon = isIncome 
-      ? '<i class="fa-solid fa-sack-dollar" style="color: var(--color-positive);"></i>'
-      : '<i class="fa-solid fa-sack-dollar" style="color: var(--color-negative);"></i>';
+    const iconColor = isIncome ? 'var(--color-positive)' : 'var(--color-negative)';
     const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
-    
+    const typeLabel = rec.type.charAt(0).toUpperCase() + rec.type.slice(1);
     return `
-    <div class="recurring-item" style="border-left-color: ${account?.colour || '#2E86DE'}; position: relative;">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        ${icon}
-        <h4 style="margin: 0;">${rec.type.charAt(0).toUpperCase() + rec.type.slice(1)}</h4>
+      <div class="recurring-item" style="border-left-color:${account?.colour || '#2E86DE'};">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-sack-dollar" style="color:${iconColor};font-size:24px;"></i>
+            <span style="font-weight:600;font-size:14px;">${typeLabel}</span>
+          </div>
+          <button onclick="executeRecurring('${rec.id}')" class="btn-primary" style="padding:4px 10px;font-size:12px;display:flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-play"></i>
+            <span>Execute</span>
+          </button>
+        </div>
+        <div style="font-size:18px;font-weight:700;">${formatNumber(rec.amount)} ${currency}</div>
+        <div style="font-size:12px;opacity:.7;margin-top:4px;">${accountName}</div>
+        ${rec.category ? `<div style="font-size:11px;opacity:.65;margin-top:4px;">${rec.category}</div>` : ''}
+        ${rec.note ? `<div style="font-size:11px;opacity:.55;margin-top:4px;">${rec.note}</div>` : ''}
       </div>
-      <div style="font-size: 18px; font-weight: bold; margin: 5px 0;">${formatNumber(rec.amount)} ${currency}</div>
-      <div style="font-size: 12px; opacity: 0.8; margin: 5px 0;">${accountName}</div>
-      ${rec.category ? `<div style="font-size: 12px; opacity: 0.7;">Category: ${rec.category}</div>` : ''}
-      ${rec.note ? `<div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">${rec.note}</div>` : ''}
-      <div style="margin-top: 15px; display: flex; gap: 10px;">
-        <button onclick="executeRecurring('${rec.id}')" class="btn-primary" style="font-size: 12px; padding: 5px 10px;">
-          <i class="fa-solid fa-play"></i> Execute
-        </button>
-        <button onclick="editRecurring('${rec.id}')" style="font-size: 12px; padding: 5px 10px;">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-        <button onclick="deleteRecurring('${rec.id}')" style="font-size: 12px; padding: 5px 10px;">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-    </div>
-  `}).join('');
+    `;
+  }).join('');
   
   list.innerHTML = items;
 }
@@ -949,7 +943,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.66 safely
+// Parse amounts written as 1.234,56 or 1234.76 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
