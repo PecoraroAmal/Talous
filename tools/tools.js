@@ -244,15 +244,14 @@ function renderRecurringPayments() {
   }
   
   const items = data.recurringPayments.map(rec => {
-    const isIncome = rec.type === 'income';
-    const iconColor = isIncome ? 'var(--color-positive)' : (rec.type==='expense' ? 'var(--color-negative)' : 'var(--fg-dim)');
-    const cardBg = isIncome ? 'var(--positive-bg, rgba(34,197,94,0.08))' : (rec.type==='expense' ? 'var(--negative-bg, rgba(239,68,68,0.08))' : 'var(--neutral-bg, rgba(107,114,128,0.10))');
     const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
     const typeLabel = rec.type.charAt(0).toUpperCase() + rec.type.slice(1);
+    const iconColor = rec.type === 'income' ? 'var(--color-positive)' : (rec.type === 'expense' ? 'var(--color-negative)' : 'var(--fg-dim)');
+    const borderColor = rec.type === 'income' ? 'var(--color-positive)' : (rec.type === 'expense' ? 'var(--color-negative)' : '#6b7280');
     return `
-      <div class="recurring-item" style="border-left-color:${account?.colour || '#2E86DE'};background:${cardBg};">
+      <div class="recurring-item" style="border-left-color:${borderColor};">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <i class="fa-solid fa-sack-dollar" style="color:${iconColor};font-size:24px;"></i>
@@ -267,8 +266,7 @@ function renderRecurringPayments() {
         <div style="font-size:12px;opacity:.7;margin-top:4px;">${accountName}</div>
         ${rec.category ? `<div style="font-size:11px;opacity:.65;margin-top:4px;">${rec.category}</div>` : ''}
         ${rec.note ? `<div style="font-size:11px;opacity:.55;margin-top:4px;">${rec.note}</div>` : ''}
-      </div>
-    `;
+      </div>`;
   }).join('');
   
   list.innerHTML = items;
@@ -951,7 +949,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.96 safely
+// Parse amounts written as 1.234,56 or 1234.106 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();

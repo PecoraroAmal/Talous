@@ -275,7 +275,7 @@ loadData();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Talous/sw.js?v=4.9')
+  navigator.serviceWorker.register('/Talous/sw.js?v=4.10')
     .then(reg => console.log('Settings SW registered', reg.scope))
     .catch(err => console.warn('Settings SW registration failed', err));
 }

@@ -7,6 +7,7 @@ let data = {
   categories: { income: [], expense: [] },
   paymentMethods: [],
   banks: [],
+  goals: [],
   recurringRules: []
 };
 
@@ -14,16 +15,34 @@ function loadData() {
   const stored = localStorage.getItem('talousData');
   if (stored) {
     try {
-      data = JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      data.transactions = parsed.transactions || [];
+      data.categories = parsed.categories || { income: [], expense: [] };
+      data.paymentMethods = parsed.paymentMethods || [];
+      data.banks = parsed.banks || [];
+      data.goals = parsed.goals || [];
+      data.recurringRules = parsed.recurringRules || [];
     } catch (e) {
-      console.error('Error loading data:', e);
+      console.error('Error loading data, falling back to sample:', e);
+      const fallback = JSON.parse(JSON.stringify(SAMPLE_DATA));
+      data.transactions = fallback.transactions || [];
+      data.categories = fallback.categories || { income: [], expense: [] };
+      data.paymentMethods = fallback.paymentMethods || [];
+      data.banks = fallback.banks || [];
+      data.goals = fallback.goals || [];
+      data.recurringRules = fallback.recurringRules || [];
+      localStorage.setItem('talousData', JSON.stringify(fallback));
     }
   } else {
-    // Initialize with sample data if no data exists
-    data = JSON.parse(JSON.stringify(SAMPLE_DATA)); // Deep copy
-    localStorage.setItem('talousData', JSON.stringify(data));
+    const fallback = JSON.parse(JSON.stringify(SAMPLE_DATA));
+    data.transactions = fallback.transactions || [];
+    data.categories = fallback.categories || { income: [], expense: [] };
+    data.paymentMethods = fallback.paymentMethods || [];
+    data.banks = fallback.banks || [];
+    data.goals = fallback.goals || [];
+    data.recurringRules = fallback.recurringRules || [];
+    localStorage.setItem('talousData', JSON.stringify(fallback));
   }
-  applyRecurringDue();
   renderCharts();
 }
 
@@ -35,55 +54,8 @@ function nextMonthlyDate(fromDate, day){
   return cur.toISOString().split('T')[0];
 }
 
-function applyRecurringDue(){
-  if (!Array.isArray(data.recurringRules) || data.recurringRules.length===0) return;
-  const today = new Date().toISOString().split('T')[0];
-  let added = false;
-  const balanceOn=(txs,acc,met)=>{
-    let b=0; const a=(data.banks||[]).find(x=>x.id===acc); const shared=a?.sharedBalance;
-    txs.forEach(t=>{ if (t.toGoalId) return; if(t.type==='income'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b+=t.amount; if(t.type==='expense'&&t.accountId===acc&&(shared||(t.methodId||'')===met)) b-=t.amount; if(t.type==='transfer'){ if(t.fromAccountId===acc&&(shared||(t.fromMethodId||'')===met)) b-=t.amount; if(t.toAccountId===acc&&(shared||(t.toMethodId||'')===met)) b+=t.amount; } }); return b; };
-  const accountBalanceOn=(txs,acc)=>{ let b=0; txs.forEach(t=>{ if (t.toGoalId) return; if(t.type==='income'&&t.accountId===acc) b+=t.amount; if(t.type==='expense'&&t.accountId===acc) b-=t.amount; if(t.type==='transfer'){ if(t.fromAccountId===acc) b-=t.amount; if(t.toAccountId===acc) b+=t.amount; } }); return b; };
-  data.recurringRules.forEach(rule=>{
-    let last = rule.lastApplied || rule.startDate;
-    if (!last) return;
-    let next = last;
-    while (next <= today){
-      if (rule.frequency==='monthly'){
-        next = nextMonthlyDate(next, parseInt(rule.day||'1',10)||1);
-      } else if (rule.frequency==='weekly'){
-        const dt = new Date(next); dt.setDate(dt.getDate()+7); next = dt.toISOString().split('T')[0];
-      } else if (rule.frequency==='yearly'){
-        const dt = new Date(next); dt.setFullYear(dt.getFullYear()+1); next = dt.toISOString().split('T')[0];
-      } else { break; }
-      if (next>today) break;
-      const pending = data.transactions.slice();
-      if (rule.type==='income'){
-        data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'income', amount: rule.amount, date: next, accountId: rule.accountId, methodId: rule.methodId||'', category: rule.category||'', note: rule.note||'', source: rule.source||'' });
-        added = true; rule.lastApplied = next;
-      } else if (rule.type==='expense'){
-        if (balanceOn(pending, rule.accountId, rule.methodId||'') >= rule.amount){
-          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'expense', amount: rule.amount, date: next, accountId: rule.accountId, methodId: rule.methodId||'', category: rule.category||'', note: rule.note||'' });
-          added = true; rule.lastApplied = next;
-        } else { break; }
-      } else if (rule.type==='transfer'){
-        if (balanceOn(pending, rule.fromAccountId, rule.fromMethodId||'') < rule.amount) { break; }
-        if (rule.toGoalId){
-          const g = (data.goals||[]).find(x=>x.id===rule.toGoalId);
-          if (!g || g.accountId!==rule.toAccountId) { break; }
-          const destAvail = accountBalanceOn(pending, rule.toAccountId);
-          if ((g.current||0) + rule.amount > destAvail) { break; }
-          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'transfer', amount: rule.amount, date: next, note: rule.note||'', category: '', fromAccountId: rule.fromAccountId, fromMethodId: rule.fromMethodId||'', toAccountId: rule.toAccountId, toMethodId: rule.toMethodId||'', toGoalId: rule.toGoalId });
-          g.current = (g.current||0) + rule.amount;
-          added = true; rule.lastApplied = next;
-        } else {
-          data.transactions.push({ id: Date.now().toString(36)+Math.random().toString(36).substr(2), type: 'transfer', amount: rule.amount, date: next, note: rule.note||'', category: '', fromAccountId: rule.fromAccountId, fromMethodId: rule.fromMethodId||'', toAccountId: rule.toAccountId, toMethodId: rule.toMethodId||'' });
-          added = true; rule.lastApplied = next;
-        }
-      }
-    }
-  });
-  if (added) localStorage.setItem('talousData', JSON.stringify(data));
-}
+// Recurring application disabled in current version (logic moved to Tools manual execution)
+function applyRecurringDue(){ /* intentionally empty */ }
 
 // Get chart colours based on theme
 function getChartColours() {
