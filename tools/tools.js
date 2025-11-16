@@ -254,7 +254,7 @@ function renderRecurringPayments() {
   }
   
   const items = data.recurringPayments.map(rec => {
-    const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
+    const account = data.accounts.find(a => a.id === (rec.type === 'transfer' ? rec.fromAccountId : rec.accountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
     const iconColor = rec.type === 'income' ? '#10b981' : (rec.type === 'expense' ? '#ef4444' : '#6b7280');
@@ -962,7 +962,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1235.06 safely
+// Parse amounts written as 1.234,56 or 1235.16 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
