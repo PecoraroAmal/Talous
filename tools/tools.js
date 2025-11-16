@@ -27,6 +27,16 @@ function hideConfirmModal() {
   pendingDelete = null;
 }
 
+function showSuccessModal(message) {
+  document.getElementById('success-message').innerHTML = message;
+  document.getElementById('success-modal').classList.remove('hidden');
+}
+
+function hideSuccessModal() {
+  document.getElementById('success-modal').classList.add('hidden');
+  location.reload();
+}
+
 function confirmDelete() {
   if (pendingDelete && pendingDelete.callback) {
     pendingDelete.callback();
@@ -488,8 +498,7 @@ function executeRecurring(id) {
   
   data.transactions.push(transaction);
   saveData();
-  alert(`Transaction executed successfully! Date: ${transaction.date}`);
-  renderRecurringPayments();
+  showSuccessModal(`Transaction executed successfully!<br>Date: ${transaction.date}`);
 }
 
 function deleteRecurring(id) {
@@ -953,7 +962,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1234.126 safely
+// Parse amounts written as 1.234,56 or 1235.06 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
@@ -1004,6 +1013,8 @@ document.getElementById('payment-method-account')?.addEventListener('change', (e
 
 document.getElementById('confirm-yes')?.addEventListener('click', confirmDelete);
 document.getElementById('confirm-no')?.addEventListener('click', hideConfirmModal);
+
+document.getElementById('success-ok')?.addEventListener('click', hideSuccessModal);
 
 // Close modals when clicking outside
 document.querySelectorAll('.modal-overlay:not(#confirm-modal)').forEach(modal => {
