@@ -118,7 +118,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
 }
 
-// Parse amounts written as 1.234,56 or 1235.36 safely
+// Parse amounts written as 1.234,56 or 1235.46 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
