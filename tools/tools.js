@@ -314,6 +314,10 @@ function showRecurringModal(rec = null) {
     document.getElementById('rec-note').value = rec.note || '';
     document.getElementById('rec-cat').value = rec.category || '';
     
+    // Update UI first to show correct fields
+    updateRecurringUI();
+    
+    // Then populate the values
     if (rec.type !== 'transfer') {
       document.getElementById('rec-acc').value = rec.accountId || '';
       fillRecMethods();
@@ -333,9 +337,9 @@ function showRecurringModal(rec = null) {
     }
   } else {
     form.reset();
+    updateRecurringUI();
   }
   
-  updateRecurringUI();
   modal.classList.remove('hidden');
 }
 
@@ -962,7 +966,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1235.16 safely
+// Parse amounts written as 1.234,56 or 1235.26 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();

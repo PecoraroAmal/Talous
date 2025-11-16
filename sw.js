@@ -1,4 +1,4 @@
-const APP_VERSION = 'v5.1';
+const APP_VERSION = 'v5.2';
 const CACHE_NAME = `talous-cache-${APP_VERSION}`;
 const urlsToCache = [
   `/Talous/index.html?${APP_VERSION}`,
@@ -32,7 +32,7 @@ const urlsToCache = [
   `/Talous/icons/apple-touch-icon.png?${APP_VERSION}`,
   `/Talous/icons/favicon-96x96.png?${APP_VERSION}`,
   // External CDNs (no versioning)
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js'
 ];
