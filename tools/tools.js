@@ -93,6 +93,14 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+// Normalize legacy/type variants (e.g., 'transfert' -> 'transfer')
+function normalizeType(t){
+  if(!t) return t;
+  const s=String(t).toLowerCase();
+  if(s==='transfert') return 'transfer';
+  return s;
+}
+
 // Render all sections
 function renderAll() {
   renderAccounts();
@@ -136,8 +144,10 @@ function renderAccounts() {
       </div>
       ${methodsHtml}
       <div class="item-actions">
-        <button onclick="editAccount('${account.id}')"><i class="fa-solid fa-pen"></i></button>
-      </div>
+        // Normalize recurring/types
+        data.recurringPayments = (parsed.recurringPayments || []).map(r => ({ ...r, type: normalizeType(r.type) }));
+        // Normalize transactions types too for compatibility
+        data.transactions = (parsed.transactions || []).map(t => ({ ...t, type: normalizeType(t.type) }));
     </div>`;
   }).join('');
   list.innerHTML = items;
@@ -148,8 +158,8 @@ function computeAccountBalance(accId){
   const acc=data.accounts.find(a=>a.id===accId);
   const shared=acc?.sharedBalance;
   (data.transactions||[]).forEach(t=>{
-    if(t.toGoalId) return;
-    if(t.type==='income'&&t.accountId===accId&&(shared||(t.methodId||'')===t.methodId)) b+=t.amount;
+      data.recurringPayments = (parsed.recurringPayments || []).map(r => ({ ...r, type: normalizeType(r.type) }));
+      data.transactions = (parsed.transactions || []).map(t => ({ ...t, type: normalizeType(t.type) }));
     if(t.type==='expense'&&t.accountId===accId&&(shared||(t.methodId||'')===t.methodId)) b-=t.amount;
     if(t.type==='transfer'){
       if(t.fromAccountId===accId) b-=t.amount;
@@ -246,15 +256,9 @@ window.editAccount = function(id) {
 let editingRecurring = null;
 
 function renderRecurringPayments() {
-  const list = document.getElementById('recurring-list');
-  
-  if (!data.recurringPayments || data.recurringPayments.length === 0) {
-    list.innerHTML = '<p style="opacity: 0.6; text-align: center; padding: 40px; grid-column: 1 / -1;">No recurring payments yet. Click the + button above to add your first recurring payment.</p>';
-    return;
-  }
-  
+  const list = document.getElementById('recurring-list');  
   const items = data.recurringPayments.map(rec => {
-    const account = data.accounts.find(a => a.id === (rec.type === 'transfer' ? rec.fromAccountId : rec.accountId));
+    const account = data.accounts.find(a => a.id === (rec.accountId || rec.fromAccountId));
     const accountName = account ? account.name : 'Unknown';
     const currency = account?.currency || 'EUR';
     const iconColor = rec.type === 'income' ? '#10b981' : (rec.type === 'expense' ? '#ef4444' : '#6b7280');
@@ -308,17 +312,14 @@ function showRecurringModal(rec = null) {
   document.getElementById('rec-cat').innerHTML = '<option value="">Select Category</option>' + catOptions;
   
   if (rec) {
-    document.getElementById('rec-type').value = rec.type;
+    const recType = normalizeType(rec.type);
+    document.getElementById('rec-type').value = recType;
     document.getElementById('rec-amount').value = rec.amount;
     document.getElementById('rec-source').value = rec.source || '';
     document.getElementById('rec-note').value = rec.note || '';
     document.getElementById('rec-cat').value = rec.category || '';
     
-    // Update UI first to show correct fields
-    updateRecurringUI();
-    
-    // Then populate the values
-    if (rec.type !== 'transfer') {
+    if (recType !== 'transfer') {
       document.getElementById('rec-acc').value = rec.accountId || '';
       fillRecMethods();
       document.getElementById('rec-method').value = rec.methodId || 'none';
@@ -329,17 +330,19 @@ function showRecurringModal(rec = null) {
       fillRecToMethods();
       document.getElementById('rec-from-method').value = rec.fromMethodId || 'none';
       document.getElementById('rec-to-method').value = rec.toMethodId || 'none';
-      if (rec.toGoalId) {
-        document.getElementById('rec-to-goal').checked = true;
+      const toGoalEl = document.getElementById('rec-to-goal');
+      if (rec.toGoalId && toGoalEl) {
+        toGoalEl.checked = true;
         fillRecGoals();
-        document.getElementById('rec-goal-select').value = rec.toGoalId;
+        const goalSel = document.getElementById('rec-goal-select');
+        if (goalSel) goalSel.value = rec.toGoalId;
       }
     }
   } else {
     form.reset();
-    updateRecurringUI();
   }
   
+  updateRecurringUI();
   modal.classList.remove('hidden');
 }
 
@@ -380,12 +383,17 @@ function updateRecurringUI() {
     setRequired('rec-to-method', true);
     // Category not required for transfer
     setRequired('rec-cat', false);
-    const toGoal = document.getElementById('rec-to-goal').checked;
+    const toGoalEl = document.getElementById('rec-to-goal');
     const goalDest = document.getElementById('rec-goal-dest');
-    goalDest.classList.toggle('hidden', !toGoal);
-    if (toGoal) {
-      fillRecGoals();
-      setRequired('rec-goal-select', true);
+    if (toGoalEl && goalDest) {
+      const toGoal = toGoalEl.checked;
+      goalDest.classList.toggle('hidden', !toGoal);
+      if (toGoal) {
+        fillRecGoals();
+        setRequired('rec-goal-select', true);
+      } else {
+        setRequired('rec-goal-select', false);
+      }
     } else {
       setRequired('rec-goal-select', false);
     }
@@ -475,25 +483,26 @@ function saveRecurring(e) {
 function executeRecurring(id) {
   const rec = data.recurringPayments.find(r => r.id === id);
   if (!rec) return;
+  const type = normalizeType(rec.type);
   
   // Create a transaction with current date
   const transaction = {
     id: generateId(),
-    type: rec.type,
+    type: type,
     amount: rec.amount,
     date: new Date().toISOString().split('T')[0],
     note: rec.note || '',
     category: rec.category || ''
   };
   
-  if (rec.type === 'income') {
+  if (type === 'income') {
     transaction.source = rec.source || '';
     transaction.accountId = rec.accountId;
     transaction.methodId = rec.methodId || '';
-  } else if (rec.type === 'expense') {
+  } else if (type === 'expense') {
     transaction.accountId = rec.accountId;
     transaction.methodId = rec.methodId || '';
-  } else if (rec.type === 'transfer') {
+  } else if (type === 'transfer') {
     transaction.fromAccountId = rec.fromAccountId;
     transaction.toAccountId = rec.toAccountId;
     transaction.fromMethodId = rec.fromMethodId || '';
@@ -966,7 +975,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-// Parse amounts written as 1.234,56 or 1235.26 safely
+// Parse amounts written as 1.234,56 or 1235.36 safely
 function parseAmountEU(value){
   if (typeof value === 'number') return value;
   let s=(value||'').toString().trim();
